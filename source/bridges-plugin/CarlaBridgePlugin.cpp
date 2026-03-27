@@ -128,7 +128,7 @@ static void gLoadPluginState()
 {
     if (File(gProjectFilename).existsAsFile())
     {
-        if (carla_load_plugin_state(gHostHandle, 0, gProjectFilename.toRawUTF8()))
+        if (carla_load_plugin_state(gHostHandle, 0, gProjectFilename.buffer()))
             carla_stdout("Plugin state loaded successfully");
         else
             carla_stderr("Plugin state load failed, error was:\n%s", carla_get_last_error(gHostHandle));
@@ -136,7 +136,7 @@ static void gLoadPluginState()
     else
     {
         carla_stdout("Previous plugin state in '%s' is non-existent, will use default state",
-                        gProjectFilename.toRawUTF8());
+                        gProjectFilename.buffer());
     }
 }
 
@@ -144,7 +144,7 @@ static void gSavePluginState()
 {
     if (gProjectFilename.isNotEmpty())
     {
-        if (! carla_save_plugin_state(gHostHandle, 0, gProjectFilename.toRawUTF8()))
+        if (! carla_save_plugin_state(gHostHandle, 0, gProjectFilename.buffer()))
             carla_stderr("Plugin preset save failed, error was:\n%s", carla_get_last_error(gHostHandle));
     }
 }

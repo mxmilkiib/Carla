@@ -4260,7 +4260,7 @@ private:
 
             if (events.count() == 0)
             {
-                carla_msleep(fIsInternalClient ? 50 : 200);
+                d_msleep(fIsInternalClient ? 50 : 200);
                 continue;
             }
 
@@ -4308,8 +4308,6 @@ private:
                                                  ev.portRename.newShortName);
                     break;
 
-                case PostPonedJackEvent::kTypeClientRegister:
-                    break;
                 }
             }
 
