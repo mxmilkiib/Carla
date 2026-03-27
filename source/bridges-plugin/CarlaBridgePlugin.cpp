@@ -59,6 +59,7 @@ static bool gIsInitiated = false;
 static volatile bool gCloseBridge = false;
 static volatile bool gCloseSignal = false;
 static volatile bool gSaveNow  = false;
+static volatile bool gLoadNow  = false;
 
 #if defined(CARLA_OS_UNIX)
 static void closeSignalHandler(int) noexcept
@@ -68,6 +69,10 @@ static void closeSignalHandler(int) noexcept
 static void saveSignalHandler(int) noexcept
 {
     gSaveNow = true;
+}
+static void loadSignalHandler(int) noexcept
+{
+    gLoadNow = true;
 }
 #elif defined(CARLA_OS_WIN)
 static LONG WINAPI winExceptionFilter(_EXCEPTION_POINTERS*)
@@ -102,6 +107,11 @@ static void initSignalHandler()
     sig.sa_flags   = SA_RESTART;
     sigemptyset(&sig.sa_mask);
     sigaction(SIGUSR1, &sig, nullptr);
+
+    sig.sa_handler = loadSignalHandler;
+    sig.sa_flags   = SA_RESTART;
+    sigemptyset(&sig.sa_mask);
+    sigaction(SIGUSR2, &sig, nullptr);
 #elif defined(CARLA_OS_WIN)
     SetConsoleCtrlHandler(winSignalHandler, TRUE);
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
@@ -114,6 +124,31 @@ static void initSignalHandler()
 static CarlaHostHandle gHostHandle;
 static String gProjectFilename;
 
+static void gLoadPluginState()
+{
+    if (File(gProjectFilename).existsAsFile())
+    {
+        if (carla_load_plugin_state(gHostHandle, 0, gProjectFilename.toRawUTF8()))
+            carla_stdout("Plugin state loaded successfully");
+        else
+            carla_stderr("Plugin state load failed, error was:\n%s", carla_get_last_error(gHostHandle));
+    }
+    else
+    {
+        carla_stdout("Previous plugin state in '%s' is non-existent, will use default state",
+                        gProjectFilename.toRawUTF8());
+    }
+}
+
+static void gSavePluginState()
+{
+    if (gProjectFilename.isNotEmpty())
+    {
+        if (! carla_save_plugin_state(gHostHandle, 0, gProjectFilename.toRawUTF8()))
+            carla_stderr("Plugin preset save failed, error was:\n%s", carla_get_last_error(gHostHandle));
+    }
+}
+
 static void gIdle()
 {
     carla_engine_idle(gHostHandle);
@@ -121,12 +156,13 @@ static void gIdle()
     if (gSaveNow)
     {
         gSaveNow = false;
+        gSavePluginState();
+    }
 
-        if (gProjectFilename.isNotEmpty())
-        {
-            if (! carla_save_plugin_state(gHostHandle, 0, gProjectFilename))
-                carla_stderr("Plugin preset save failed, error was:\n%s", carla_get_last_error(gHostHandle));
-        }
+    if (gLoadNow)
+    {
+        gLoadNow = false;
+        gLoadPluginState();
     }
 }
 
@@ -201,18 +237,7 @@ public:
             if (! File::isAbsolutePath(gProjectFilename))
                 gProjectFilename = File::getCurrentWorkingDirectory().getChildFile(gProjectFilename).getFullPathName().toRawUTF8();
 
-            if (File(gProjectFilename).existsAsFile())
-            {
-                if (carla_load_plugin_state(gHostHandle, 0, gProjectFilename))
-                    carla_stdout("Plugin state loaded successfully");
-                else
-                    carla_stderr("Plugin state load failed, error was:\n%s", carla_get_last_error(gHostHandle));
-            }
-            else
-            {
-                carla_stdout("Previous plugin state in '%s' is non-existent, will start from default state",
-                             gProjectFilename.buffer());
-            }
+            gLoadPluginState();
         }
 
         gIsInitiated = true;
