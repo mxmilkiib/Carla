@@ -24,6 +24,7 @@ endif
 
 # see also cmake/CMakeLists.txt, source/common/__init__.py and source/includes/CarlaDefines.h
 VERSION   := 2.6.0-alpha1
+PYTHON    := python3
 
 -include Makefile.user.mk
 
@@ -605,6 +606,8 @@ endif
 		bin/resources/carla-plugin-patchbay \
 		bin/resources/*-ui \
 		$(DESTDIR)$(DATADIR)/carla/resources
+		
+	
 endif # CPPMODE
 
 ifeq ($(HAVE_THEME),true)
@@ -765,6 +768,11 @@ ifeq ($(HAVE_FRONTEND),true)
 	$(LINK) ../../carla/styles $(DESTDIR)$(LIBDIR)/vst/carla.vst/styles
 endif
 endif
+
+
+	# -------------------------------------------------------------------------------------------------------------
+	# compile all python .pyc files to __pycache__ for faster application start
+	$(PYTHON) -m compileall $(DATADIR)/carla
 
 # ---------------------------------------------------------------------------------------------------------------------
 
