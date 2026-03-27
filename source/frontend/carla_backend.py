@@ -723,7 +723,6 @@ ENGINE_CALLBACK_PATCHBAY_CLIENT_DATA_CHANGED = 23
 # @a pluginId Client Id
 # @a value1   Port Id
 # @a value2   Port hints
-# @a value3   Port group Id (0 for none)
 # @a valueStr Port name
 # @see PatchbayPortHints
 ENGINE_CALLBACK_PATCHBAY_PORT_ADDED = 24
@@ -737,7 +736,6 @@ ENGINE_CALLBACK_PATCHBAY_PORT_REMOVED = 25
 # @a pluginId Client Id
 # @a value1   Port Id
 # @a value2   Port hints
-# @a value3   Port group Id (0 for none)
 # @a valueStr New port name
 ENGINE_CALLBACK_PATCHBAY_PORT_CHANGED = 26
 

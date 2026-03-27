@@ -37,23 +37,25 @@ PORT_TYPE_MIDI_ALSA  = 3
 PORT_TYPE_PARAMETER  = 4
 
 # Callback Action
-ACTION_GROUP_INFO       =  0 # group_id, N, N
-ACTION_GROUP_RENAME     =  1 # group_id, N, N
-ACTION_GROUP_SPLIT      =  2 # group_id, N, N
-ACTION_GROUP_JOIN       =  3 # group_id, N, N
-ACTION_GROUP_POSITION   =  4 # group_id, N, N, "x1:y1:x2:y2"
-ACTION_PORT_INFO        =  5 # group_id, port_id, N
-ACTION_PORT_RENAME      =  6 # group_id, port_id, N
-ACTION_PORTS_CONNECT    =  7 # N, N, "outG:outP:inG:inP"
-ACTION_PORTS_DISCONNECT =  8 # conn_id, N, N
-ACTION_PLUGIN_CLONE     =  9 # plugin_id, N, N
-ACTION_PLUGIN_EDIT      = 10 # plugin_id, N, N
-ACTION_PLUGIN_RENAME    = 11 # plugin_id, N, N
-ACTION_PLUGIN_REPLACE   = 12 # plugin_id, N, N
-ACTION_PLUGIN_REMOVE    = 13 # plugin_id, N, N
-ACTION_PLUGIN_SHOW_UI   = 14 # plugin_id, N, N
-ACTION_BG_RIGHT_CLICK   = 15 # N, N, N
-ACTION_INLINE_DISPLAY   = 16 # plugin_id, N, N
+ACTION_GROUP_INFO        =  0 # group_id, N, N
+ACTION_GROUP_RENAME      =  1 # group_id, N, N
+ACTION_GROUP_SPLIT       =  2 # group_id, N, N
+ACTION_GROUP_JOIN        =  3 # group_id, N, N
+ACTION_GROUP_POSITION    =  4 # group_id, N, N, "x1:y1:x2:y2"
+ACTION_PORT_GROUP_ADD    =  5 # N, N, "gId:pgId:pMode:pType:portId1:portId2"
+ACTION_PORT_GROUP_REMOVE =  6 # group_id, portgrp_id, N
+ACTION_PORT_INFO         =  7 # group_id, port_id, N
+ACTION_PORT_RENAME       =  8 # group_id, port_id, N
+ACTION_PORTS_CONNECT     =  9 # N, N, "outG:outP:inG:inP"
+ACTION_PORTS_DISCONNECT  = 10 # conn_id, N, N
+ACTION_PLUGIN_CLONE      = 11 # plugin_id, N, N
+ACTION_PLUGIN_EDIT       = 12 # plugin_id, N, N
+ACTION_PLUGIN_RENAME     = 13 # plugin_id, N, N
+ACTION_PLUGIN_REPLACE    = 14 # plugin_id, N, N
+ACTION_PLUGIN_REMOVE     = 15 # plugin_id, N, N
+ACTION_PLUGIN_SHOW_UI    = 16 # plugin_id, N, N
+ACTION_BG_RIGHT_CLICK    = 17 # N, N, N
+ACTION_INLINE_DISPLAY    = 18 # plugin_id, N, N
 
 # Icon
 ICON_APPLICATION = 0
@@ -84,11 +86,12 @@ EYECANDY_FULL  = 2
 CanvasBoxType           = QGraphicsItem.UserType + 1
 CanvasIconType          = QGraphicsItem.UserType + 2
 CanvasPortType          = QGraphicsItem.UserType + 3
-CanvasLineType          = QGraphicsItem.UserType + 4
-CanvasBezierLineType    = QGraphicsItem.UserType + 5
-CanvasLineMovType       = QGraphicsItem.UserType + 6
-CanvasBezierLineMovType = QGraphicsItem.UserType + 7
-CanvasRubberbandType    = QGraphicsItem.UserType + 8
+CanvasPortGroupType     = QGraphicsItem.UserType + 4
+CanvasLineType          = QGraphicsItem.UserType + 5
+CanvasBezierLineType    = QGraphicsItem.UserType + 6
+CanvasLineMovType       = QGraphicsItem.UserType + 7
+CanvasBezierLineMovType = QGraphicsItem.UserType + 8
+CanvasRubberbandType    = QGraphicsItem.UserType + 9
 
 # ------------------------------------------------------------------------------------------------------------
 
@@ -124,6 +127,7 @@ class Canvas(object):
 
         self.group_list = []
         self.port_list = []
+        self.portgrp_list = []
         self.connection_list = []
         self.animation_list = []
         self.group_plugin_map = {}
@@ -162,7 +166,18 @@ class port_dict_t(object):
         'port_name',
         'port_mode',
         'port_type',
+        'portgrp_id',
         'is_alternate',
+        'widget'
+    ]
+
+class portgrp_dict_t(object):
+    __slots__ = [
+        'portgrp_id',
+        'group_id',
+        'port_mode',
+        'port_type',
+        'port_id_list',
         'widget'
     ]
 

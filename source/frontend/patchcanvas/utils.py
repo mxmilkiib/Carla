@@ -80,6 +80,119 @@ def CanvasGetPortConnectionList(group_id, port_id):
 
     return conn_list
 
+def CanvasGetPortGroupPosition(group_id, port_id, portgrp_id):
+    if portgrp_id < 0:
+        return (0, 1)
+    
+    for portgrp in canvas.portgrp_list:
+        if (portgrp.group_id == group_id
+                and portgrp.portgrp_id == portgrp_id):
+            for i in range(len(portgrp.port_id_list)):
+                if port_id == portgrp.port_id_list[i]:
+                    return (i, len(portgrp.port_id_list))
+    return (0, 1)
+
+def CanvasGetPortGroupName(group_id, ports_ids_list):
+    ports_names = []
+    
+    for port in canvas.port_list:
+        if port.group_id == group_id and port.port_id in ports_ids_list:
+            ports_names.append(port.port_name)
+    
+    if len(ports_names) < 2:
+        return ''
+    
+    portgrp_name_ends = ( ' ', '_', '.', '-', '#', ':', 'out', 'in', 'Out',
+                            'In', 'Output', 'Input', 'output', 'input' )
+    
+    # set portgrp name
+    portgrp_name = ''
+    checkCharacter = True
+    
+    for c in ports_names[0]:        
+        for eachname in ports_names:
+            if not eachname.startswith(portgrp_name + c):
+                checkCharacter = False
+                break
+        if not checkCharacter:
+            break
+        portgrp_name += c
+    
+    # reduce portgrp name until it ends with one of the characters
+    # in portgrp_name_ends
+    check = False
+    while not check:
+        for x in portgrp_name_ends:
+            if portgrp_name.endswith(x):
+                check = True
+                break
+        
+        if len(portgrp_name) == 0 or portgrp_name in ports_names:
+                check = True
+            
+        if not check:
+            portgrp_name = portgrp_name[:-1]
+    
+    return portgrp_name
+
+def CanvasGetPortPrintName(group_id, port_id, portgrp_id):
+    for portgrp in canvas.portgrp_list:
+        if (portgrp.group_id == group_id
+                and portgrp.portgrp_id == portgrp_id):
+            portgrp_name = CanvasGetPortGroupName(group_id,
+                                                     portgrp.port_id_list)
+            for port in canvas.port_list:
+                if port.group_id == group_id and port.port_id == port_id:
+                    return port.port_name.replace(portgrp_name, '', 1)
+
+def CanvasGetPortGroupFullName(group_id, portgrp_id):
+    for portgrp in canvas.portgrp_list:
+        if (portgrp.group_id == group_id
+                and portgrp.portgrp_id == portgrp_id):
+            group_name = ""
+            for group in canvas.group_list:
+                if group.group_id == group_id:
+                    group_name = group.group_name
+                    break
+            else:
+                return ""
+            
+            endofname = ''
+            for port_id in portgrp.port_id_list:
+                endofname += "%s/" % CanvasGetPortPrintName(group_id, port_id,
+                                                     portgrp.portgrp_id)
+            portgrp_name = CanvasGetPortGroupName(group_id, 
+                                                     portgrp.port_id_list)
+            
+            return "%s:%s %s" % (group_name, portgrp_name, endofname[:-1])
+    
+    return ""
+
+def CanvasConnectionMatches(connection, group_id_1, port_ids_list_1,
+                            group_id_2, port_ids_list_2):
+    if (connection.group_in_id == group_id_1
+        and connection.port_in_id in port_ids_list_1
+        and connection.group_out_id == group_id_2
+        and connection.port_out_id in port_ids_list_2):
+            return True
+    elif (connection.group_in_id == group_id_2
+          and connection.port_in_id in port_ids_list_2
+          and connection.group_out_id == group_id_1
+          and connection.port_out_id in port_ids_list_1):
+            return True
+    else:
+        return False
+
+def CanvasConnectionConcerns(connection, group_id, port_ids_list):
+    if (connection.group_in_id == group_id
+        and connection.port_in_id in port_ids_list):
+            return True
+    elif (connection.group_out_id == group_id
+          and connection.port_out_id in port_ids_list):
+              return True
+    else:
+        return False
+            
 def CanvasCallback(action, value1, value2, value_str):
     if canvas.debug:
         print("PatchCanvas::CanvasCallback(%i, %i, %i, %s)" % (action, value1, value2, value_str.encode()))

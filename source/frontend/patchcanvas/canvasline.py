@@ -81,12 +81,40 @@ class CanvasLine(QGraphicsLineItem):
 
     def updateLinePos(self):
         if self.item1.getPortMode() == PORT_MODE_OUTPUT:
-            rect1 = self.item1.sceneBoundingRect()
-            rect2 = self.item2.sceneBoundingRect()
-            line = QLineF(rect1.right(),
-                          rect1.top() + float(canvas.theme.port_height)/2,
-                          rect2.left(),
-                          rect2.top() + float(canvas.theme.port_height)/2)
+            port_pos_1, portgrp_len_1 = self.item1.getPortGroupPosition()
+            
+            if portgrp_len_1 > 2:
+                phi = 0.75
+            else:
+                phi = 0.62
+            
+            if portgrp_len_1 > 1:
+                first_old_y = canvas.theme.port_height * phi
+                last_old_y  = canvas.theme.port_height * (portgrp_len_1 - phi)
+                delta = (last_old_y - first_old_y) / (portgrp_len_1 -1)
+                Y1 = first_old_y + (port_pos_1 * delta) - (canvas.theme.port_height * port_pos_1)
+            else:
+                Y1 = canvas.theme.port_height / 2
+                
+            port_pos_2, portgrp_len_2 = self.item2.getPortGroupPosition()
+            
+            if portgrp_len_2 > 2:
+                phi = 0.75
+            else:
+                phi = 0.62
+            
+            if portgrp_len_2 > 1:
+                first_old_y = canvas.theme.port_height * phi
+                last_old_y  = canvas.theme.port_height * (portgrp_len_2 - phi)
+                delta = (last_old_y - first_old_y) / (portgrp_len_2 -1)
+                Y2 = first_old_y + (port_pos_2 * delta) - (canvas.theme.port_height * port_pos_2)
+            else:
+                Y2 = canvas.theme.port_height / 2
+            
+            line = QLineF(self.item1.scenePos().x() + self.item1.getPortWidth() + 12,
+                          self.item1.scenePos().y() + Y1,
+                          self.item2.scenePos().x(),
+                          self.item2.scenePos().y() + Y2)
             self.setLine(line)
 
             self.m_lineSelected = False

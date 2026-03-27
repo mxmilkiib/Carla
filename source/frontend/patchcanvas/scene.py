@@ -26,6 +26,7 @@ from . import (
     CanvasBoxType,
     CanvasIconType,
     CanvasPortType,
+    CanvasPortGroupType,
     CanvasLineType,
     CanvasBezierLineType,
     CanvasRubberbandType,
@@ -319,13 +320,11 @@ class PatchScene(QGraphicsScene):
     def mouseMoveEvent(self, event):
         if self.m_mouse_down_init:
             self.m_mouse_down_init = False
-            items = self.items(event.scenePos())
-            for item in items:
-                if item and item.type() in (CanvasBoxType, CanvasIconType, CanvasPortType):
-                    self.m_mouse_rubberband = False
-                    break
-            else:
-                self.m_mouse_rubberband = True
+            topmost = self.itemAt(event.scenePos(), self.m_view.transform())
+            self.m_mouse_rubberband = not (topmost and topmost.type() in (CanvasBoxType,
+                                                                          CanvasIconType,
+                                                                          CanvasPortType,
+                                                                          CanvasPortGroupType))
 
         if self.m_mouse_rubberband:
             event.accept()

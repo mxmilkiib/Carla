@@ -32,6 +32,7 @@ from . import (
     PORT_TYPE_PARAMETER,
 )
 
+from .utils import CanvasGetPortGroupPosition
 from .canvasportglow import CanvasPortGlow
 
 # ------------------------------------------------------------------------------------------------------------
@@ -82,16 +83,44 @@ class CanvasBezierLine(QGraphicsPathItem):
 
     def updateLinePos(self):
         if self.item1.getPortMode() == PORT_MODE_OUTPUT:
-            rect1 = self.item1.sceneBoundingRect()
-            rect2 = self.item2.sceneBoundingRect()
+            item1_x = self.item1.scenePos().x() + self.item1.getPortWidth() + 12
+            
+            port_pos_1, portgrp_len_1 = self.item1.getPortGroupPosition()
+            
+            phi = 0.75 if portgrp_len_1 > 2 else 0.62
+            
+            if portgrp_len_1 > 1:
+                first_old_y = canvas.theme.port_height * phi
+                last_old_y = canvas.theme.port_height * (portgrp_len_1 - phi)
+                delta = (last_old_y - first_old_y) / (portgrp_len_1 -1)
+                old_y1 = first_old_y + (port_pos_1 * delta) - (canvas.theme.port_height * port_pos_1)
+            else:
+                old_y1 = canvas.theme.port_height / 2
+            
+            item1_y = self.item1.scenePos().y() + old_y1
+            
+            item2_x = self.item2.scenePos().x()
+            
+            port_pos_2, portgrp_len_2 = self.item2.getPortGroupPosition()
+            
+            phi = 0.75 if portgrp_len_1 > 2 else 0.62
+            
+            if portgrp_len_2 > 1:
+                first_old_y = canvas.theme.port_height * phi
+                last_old_y  = canvas.theme.port_height * (portgrp_len_2 - phi)
+                delta = (last_old_y - first_old_y) / (portgrp_len_2 -1)
+                old_y2 = first_old_y + (port_pos_2 * delta) - (canvas.theme.port_height * port_pos_2)
+            else:
+                old_y2 = canvas.theme.port_height / 2
+                
+            item2_y = self.item2.scenePos().y() + old_y2
 
-            item1_x = rect1.right()
-            item2_x = rect2.left()
-            item1_y = rect1.top() + float(canvas.theme.port_height)/2
-            item2_y = rect2.top() + float(canvas.theme.port_height)/2
-            item1_new_x = item1_x + abs(item1_x - item2_x) / 2
-            item2_new_x = item2_x - abs(item1_x - item2_x) / 2
+            item1_mid_x = abs(item1_x - item2_x) / 2
+            item1_new_x = item1_x + item1_mid_x
 
+            item2_mid_x = abs(item1_x - item2_x) / 2
+            item2_new_x = item2_x - item2_mid_x
+            
             path = QPainterPath(QPointF(item1_x, item1_y))
             path.cubicTo(item1_new_x, item1_y, item2_new_x, item2_y, item2_x, item2_y)
             self.setPath(path)

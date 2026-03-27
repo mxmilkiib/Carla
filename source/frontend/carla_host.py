@@ -1928,7 +1928,7 @@ class HostWindow(QMainWindow):
         else:
             portType    = patchcanvas.PORT_TYPE_NULL
             isAlternate = False
-
+        
         patchcanvas.addPort(clientId, portId, portName, portMode, portType, isAlternate)
         self.updateMiniCanvasLater()
 
@@ -1938,19 +1938,35 @@ class HostWindow(QMainWindow):
         self.updateMiniCanvasLater()
 
     @pyqtSlot(int, int, int, int, str)
-    def slot_handlePatchbayPortChangedCallback(self, groupId, portId, portFlags, portGroupId, newPortName):
-        patchcanvas.renamePort(groupId, portId, newPortName)
+    def slot_handlePatchbayPortChangedCallback(self, groupId, portId, portFlags, newPortName):
+        patchcanvas.changePortProperties(groupId, portId, newPortName)
         self.updateMiniCanvasLater()
 
     @pyqtSlot(int, int, int, str)
-    def slot_handlePatchbayPortGroupAddedCallback(self, groupId, portId, portGroupId, newPortName):
-        # TODO
-        pass
+    def slot_handlePatchbayPortGroupAddedCallback(self, groupId, portGroupFlags, portGroupId, newPortName):
+        if portFlags & PATCHBAY_PORT_IS_INPUT:
+            portMode = patchcanvas.PORT_MODE_INPUT
+        else:
+            portMode = patchcanvas.PORT_MODE_OUTPUT
+
+        if portFlags & PATCHBAY_PORT_TYPE_AUDIO:
+            portType    = patchcanvas.PORT_TYPE_AUDIO_JACK
+            isAlternate = False
+        elif portFlags & PATCHBAY_PORT_TYPE_CV:
+            portType    = patchcanvas.PORT_TYPE_AUDIO_JACK
+            isAlternate = True
+        elif portFlags & PATCHBAY_PORT_TYPE_MIDI:
+            portType    = patchcanvas.PORT_TYPE_MIDI_JACK
+            isAlternate = False
+        else:
+            portType    = patchcanvas.PORT_TYPE_NULL
+            isAlternate = False
+            
+        patchcanvas.addPortGroup(groupId, portGroupId, portMode, portType)
 
     @pyqtSlot(int, int)
-    def slot_handlePatchbayPortGroupRemovedCallback(self, groupId, portId):
-        # TODO
-        pass
+    def slot_handlePatchbayPortGroupRemovedCallback(self, groupId, portGroupId):
+        patchcanvas.removePortGroup(groupId, portGroupId)
 
     @pyqtSlot(int, int, int, str)
     def slot_handlePatchbayPortGroupChangedCallback(self, groupId, portId, portGroupId, newPortName):
@@ -3107,6 +3123,15 @@ def canvasCallback(action, value1, value2, valueStr):
         host.patchbay_set_group_pos(gCarla.gui.fExternalPatchbay, groupId, x1, y1, x2, y2)
         gCarla.gui.updateMiniCanvasLater()
 
+    elif action == patchcanvas.ACTION_PORT_GROUP_ADD:
+        gId, pMode, pType, pId1, pId2 = [int(i) for i in valueStr.split(":")]
+        patchcanvas.addPortGroup(gId, 1, pMode, pType, (pId1, pId2))
+
+    elif action == patchcanvas.ACTION_PORT_GROUP_REMOVE:
+        groupId = value1
+        portgrpId = value2
+        patchcanvas.removePortGroup(groupId, portgrpId)
+
     elif action == patchcanvas.ACTION_PORT_INFO:
         pass
 
@@ -3251,11 +3276,11 @@ def engineCallback(host, action, pluginId, value1, value2, value3, valuef, value
     elif action == ENGINE_CALLBACK_PATCHBAY_CLIENT_POSITION_CHANGED:
         host.PatchbayClientPositionChangedCallback.emit(pluginId, value1, value2, value3, int(round(valuef)))
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_ADDED:
-        host.PatchbayPortAddedCallback.emit(pluginId, value1, value2, value3, valueStr)
+        host.PatchbayPortAddedCallback.emit(pluginId, value1, value2, valueStr)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_REMOVED:
         host.PatchbayPortRemovedCallback.emit(pluginId, value1)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_CHANGED:
-        host.PatchbayPortChangedCallback.emit(pluginId, value1, value2, value3, valueStr)
+        host.PatchbayPortChangedCallback.emit(pluginId, value1, value2, valueStr)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_GROUP_ADDED:
         host.PatchbayPortGroupAddedCallback.emit(pluginId, value1, value2, valueStr)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_GROUP_REMOVED:
