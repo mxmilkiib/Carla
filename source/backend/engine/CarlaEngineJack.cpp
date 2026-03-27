@@ -4245,6 +4245,11 @@ private:
 
     void run() override
     {
+        LinkedList<PostPonedJackEvent> events;
+
+        PostPonedJackEvent nullEvent;
+        carla_zeroStruct(nullEvent);
+
         for (; ! shouldThreadExit();)
         {
             if (fIsInternalClient)
@@ -4253,8 +4258,65 @@ private:
             if (fClient == nullptr)
                 break;
 
-            d_msleep(200);
+            if (events.count() == 0)
+            {
+                carla_msleep(fIsInternalClient ? 50 : 200);
+                continue;
+            }
+
+            for (LinkedList<PostPonedJackEvent>::Itenerator it = events.begin2(); it.valid(); it.next())
+            {
+                const PostPonedJackEvent& ev(it.getValue(nullEvent));
+                CARLA_SAFE_ASSERT_CONTINUE(ev.type != PostPonedJackEvent::kTypeNull);
+
+                switch (ev.type)
+                {
+                case PostPonedJackEvent::kTypeNull:
+                    break;
+
+                case PostPonedJackEvent::kTypeClientUnregister:
+                    handleJackClientUnregistrationCallback(ev.clientUnregister.name);
+                    break;
+
+                case PostPonedJackEvent::kTypeClientPositionChange:
+                    handleJackClientPositionChangeCallback(ev.clientPositionChange.uuid);
+                    break;
+
+                case PostPonedJackEvent::kTypePortRegister:
+                    handleJackPortRegistrationCallback(ev.portRegister.fullName,
+                                                       ev.portRegister.shortName,
+                                                       ev.portRegister.hints);
+                    break;
+
+                case PostPonedJackEvent::kTypePortUnregister:
+                    handleJackPortUnregistrationCallback(ev.portUnregister.fullName);
+                    break;
+
+                case PostPonedJackEvent::kTypePortConnect:
+                    handleJackPortConnectCallback(ev.portConnect.portNameA,
+                                                  ev.portConnect.portNameB);
+                    break;
+
+                case PostPonedJackEvent::kTypePortDisconnect:
+                    handleJackPortDisconnectCallback(ev.portDisconnect.portNameA,
+                                                     ev.portDisconnect.portNameB);
+                    break;
+
+                case PostPonedJackEvent::kTypePortRename:
+                    handleJackPortRenameCallback(ev.portRename.oldFullName,
+                                                 ev.portRename.newFullName,
+                                                 ev.portRename.newShortName);
+                    break;
+
+                case PostPonedJackEvent::kTypeClientRegister:
+                    break;
+                }
+            }
+
+            events.clear();
         }
+
+        events.clear();
     }
 #endif //  BUILD_BRIDGE
 
