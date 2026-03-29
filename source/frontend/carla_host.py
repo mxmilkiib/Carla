@@ -201,6 +201,7 @@ class HostWindow(QMainWindow):
         self.fIdleTimerNull = self.startTimer(1000) # keep application signals alive
         self.fIdleTimerFast = 0
         self.fIdleTimerSlow = 0
+        self.fIdleTimerDsp  = 0
 
         self.fLadspaRdfNeedsUpdate = True
         self.fLadspaRdfList = []
@@ -2261,7 +2262,8 @@ class HostWindow(QMainWindow):
             CARLA_KEY_MAIN_PROJECT_FOLDER:      settings.value(CARLA_KEY_MAIN_PROJECT_FOLDER,      CARLA_DEFAULT_MAIN_PROJECT_FOLDER,      str),
             CARLA_KEY_MAIN_CONFIRM_EXIT:        settings.value(CARLA_KEY_MAIN_CONFIRM_EXIT,        CARLA_DEFAULT_MAIN_CONFIRM_EXIT,        bool),
             CARLA_KEY_MAIN_CLASSIC_SKIN:        settings.value(CARLA_KEY_MAIN_CLASSIC_SKIN,        CARLA_DEFAULT_MAIN_CLASSIC_SKIN,        bool),
-            CARLA_KEY_MAIN_REFRESH_INTERVAL:    settings.value(CARLA_KEY_MAIN_REFRESH_INTERVAL,    CARLA_DEFAULT_MAIN_REFRESH_INTERVAL,    int),
+            CARLA_KEY_MAIN_REFRESH_INTERVAL:        settings.value(CARLA_KEY_MAIN_REFRESH_INTERVAL,        CARLA_DEFAULT_MAIN_REFRESH_INTERVAL,        int),
+            CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL:    settings.value(CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL,    CARLA_DEFAULT_MAIN_DSP_REFRESH_INTERVAL,    int),
             CARLA_KEY_MAIN_SYSTEM_ICONS:        settings.value(CARLA_KEY_MAIN_SYSTEM_ICONS,        CARLA_DEFAULT_MAIN_SYSTEM_ICONS,        bool),
             CARLA_KEY_MAIN_EXPERIMENTAL:        settings.value(CARLA_KEY_MAIN_EXPERIMENTAL,        CARLA_DEFAULT_MAIN_EXPERIMENTAL,        bool),
             CARLA_KEY_MAIN_SKIN_TWEAKS:         settings.value(CARLA_KEY_MAIN_SKIN_TWEAKS,         CARLA_DEFAULT_MAIN_SKIN_TWEAKS,         str),
@@ -2808,6 +2810,9 @@ class HostWindow(QMainWindow):
         if self.fIdleTimerSlow == 0:
             self.fIdleTimerSlow = self.startTimer(self.fSavedSettings[CARLA_KEY_MAIN_REFRESH_INTERVAL]*4)
 
+        if self.fIdleTimerDsp == 0:
+            self.fIdleTimerDsp = self.startTimer(self.fSavedSettings[CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL])
+
     def restartTimersIfNeeded(self):
         if self.fIdleTimerFast != 0:
             self.killTimer(self.fIdleTimerFast)
@@ -2817,6 +2822,10 @@ class HostWindow(QMainWindow):
             self.killTimer(self.fIdleTimerSlow)
             self.fIdleTimerSlow = self.startTimer(self.fSavedSettings[CARLA_KEY_MAIN_REFRESH_INTERVAL]*4)
 
+        if self.fIdleTimerDsp != 0:
+            self.killTimer(self.fIdleTimerDsp)
+            self.fIdleTimerDsp = self.startTimer(self.fSavedSettings[CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL])
+
     def killTimers(self):
         if self.fIdleTimerFast != 0:
             self.killTimer(self.fIdleTimerFast)
@@ -2825,6 +2834,10 @@ class HostWindow(QMainWindow):
         if self.fIdleTimerSlow != 0:
             self.killTimer(self.fIdleTimerSlow)
             self.fIdleTimerSlow = 0
+
+        if self.fIdleTimerDsp != 0:
+            self.killTimer(self.fIdleTimerDsp)
+            self.fIdleTimerDsp = 0
 
     # --------------------------------------------------------------------------------------------------------
     # Misc
@@ -3133,7 +3146,6 @@ class HostWindow(QMainWindow):
         self.ui.peak_out.displayMeter(2, 0.0, True)
 
     def idleSlow(self):
-        self.getAndRefreshRuntimeInfo()
 
         self.slowTimer = (self.slowTimer + 1) % 4
         if (self.slowTimer == 0):
@@ -3154,6 +3166,9 @@ class HostWindow(QMainWindow):
 
         elif event.timerId() == self.fIdleTimerSlow:
             self.idleSlow()
+
+        elif event.timerId() == self.fIdleTimerDsp:
+            self.getAndRefreshRuntimeInfo()
 
         QMainWindow.timerEvent(self, event)
 
