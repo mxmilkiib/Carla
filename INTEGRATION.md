@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-03-30
+Last updated: 2026-03-30 (session 3)
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -102,9 +102,9 @@ Branches with dependencies on other local branches cannot be submitted upstream 
 
 ## Branch and Integration Status Outline
 
-**Summary**: 0 need attention, 0 awaiting review, 8 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
+**Summary**: 0 need attention, 0 awaiting review, 9 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
 
-Integration built 2026-03-29: merged all 14 open upstream PRs + 8 local feature/bugfix branches; build clean.
+Integration built 2026-03-30: merged all 14 open upstream PRs + 9 local feature/bugfix branches; build clean.
 Previous build 2026-03-27: merged all 14 open upstream PRs (#1397 port-groups, #1426 python-compileall, #1483 disconnect-group, #1483 unordered-events, #1555 handle-events, #1658 sigusr2-bridge, #1690 meson-build, #1734 pyqt-import-fix, #1748 pipewire-connections, #1975 vst-param-align, #1987 cygwin-fix, #2010 rack-ui-rework, #2011 osc-named-plugins, #2020 param-labels); fixed two build errors (d_msleep, DISTRHO::String::buffer()); build clean.
 
 ### Upstream PRs in Integration (merged to integrated, not yet to upstream/main)
@@ -150,6 +150,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 - [x] **feature/2026.03mar.29-dsp-bar-refresh-rate** — independent DSP bar refresh timer + settings spinbox (#1482) — merged 2026-03-30
 - [x] **feature/2026.03mar.29-patchbay-canvas-autosize** — expand scene rect after restoring group positions (#1481) — merged 2026-03-30
 - [x] **feature/2026.03mar.29-patchbay-drag-scroll** — auto-scroll canvas during rubberband drag near edge (#1577) — merged 2026-03-30
+- [x] **feature/2026.03mar.30-default-session-on-open** — load configured default project on startup when no CLI arg given (#1929) — merged 2026-03-30
 
 ### Merged to Upstream
 
@@ -161,7 +162,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 
 - Needs Attention (0 branches): (none)
 - Awaiting Review (0 branches): (none)
-- Local Development (8 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll
+- Local Development (9 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open
 - Secondary Patches (0 branches): (none)
 
 See **Feature Request Branch TODO** section at the end of this file for planned work.
@@ -457,15 +458,15 @@ embedded plugin UI tab (hard platform work).
     (compact slot class), `source/frontend/carla_widgets.py` (parameter hooks)
   - Suggested branch: `feature/YYYY.MMmon.DD-compact-slot-wet-vol-knobs`
 
-- [ ] **[#1929](https://github.com/falktx/Carla/issues/1929) — Load a default session automatically on startup** `[medium]`
+- [x] **[#1929](https://github.com/falktx/Carla/issues/1929) — Load a default session automatically on startup** `[medium]`
   - Allow users to configure a default `.carxp` file that is loaded whenever Carla starts with
     no command-line project argument.
-  - Fix: add `CARLA_KEY_MAIN_DEFAULT_PROJECT` to `carla_shared.py`; add a file-picker line in
-    the Main settings tab; in `carla_host.py` `__init__` (or the startup path), check the key
-    and call `slot_fileOpen` / `loadProjectNow` if set and the file exists.
+  - Fix: added `CARLA_KEY_MAIN_DEFAULT_PROJECT` to `carla_shared.py`; added file-picker row to
+    the Paths settings group; on startup (not NSM, not isControl/isPlugin), if no CLI project
+    and the key is set to a valid file, call `loadProjectLater` with it.
   - Files: `source/frontend/carla_shared.py`, `source/frontend/carla_host.py`,
     `source/frontend/carla_settings.py`, `resources/ui/carla_settings.ui`
-  - Suggested branch: `feature/YYYY.MMmon.DD-default-session-on-open`
+  - Branch: `feature/2026.03mar.30-default-session-on-open`
 
 - [ ] **[#1559](https://github.com/falktx/Carla/issues/1559) — Per-plugin LV2 UI selector** `[medium]`
   - `CarlaPluginLV2` already enumerates all UIs in `fRdfDescriptor->UIs` and picks one
