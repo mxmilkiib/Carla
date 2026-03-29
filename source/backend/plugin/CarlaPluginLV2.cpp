@@ -5816,10 +5816,7 @@ public:
         carla_debug("CarlaPluginLV2::handleProgramChanged(%i)", index);
 
         if (index == -1)
-        {
-            const ScopedSingleProcessLocker spl(this, true);
             return reloadPrograms(false);
-        }
 
         if (index < static_cast<int32_t>(pData->midiprog.count) && fExt.programs != nullptr && fExt.programs->get_program != nullptr)
         {
