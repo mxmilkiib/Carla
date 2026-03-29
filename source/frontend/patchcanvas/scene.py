@@ -346,6 +346,27 @@ class PatchScene(QGraphicsScene):
                                       y+lineHinting,
                                       abs(pos_x - rubberband_orig_point.x()),
                                       abs(pos_y - rubberband_orig_point.y()))
+
+            # auto-scroll when cursor approaches viewport edge
+            vp_pos  = self.m_view.mapFromScene(pos)
+            vp_rect = self.m_view.viewport().rect()
+            ZONE    = 30
+            hbar    = self.m_view.horizontalScrollBar()
+            vbar    = self.m_view.verticalScrollBar()
+            dx = 0
+            dy = 0
+            if vp_pos.x() < ZONE:
+                dx = -(ZONE - vp_pos.x()) // 2
+            elif vp_pos.x() > vp_rect.width() - ZONE:
+                dx = (vp_pos.x() - (vp_rect.width() - ZONE)) // 2
+            if vp_pos.y() < ZONE:
+                dy = -(ZONE - vp_pos.y()) // 2
+            elif vp_pos.y() > vp_rect.height() - ZONE:
+                dy = (vp_pos.y() - (vp_rect.height() - ZONE)) // 2
+            if dx:
+                hbar.setValue(hbar.value() + dx)
+            if dy:
+                vbar.setValue(vbar.value() + dy)
             return
 
         if self.m_connection_cut_mode:
