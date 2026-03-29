@@ -744,10 +744,10 @@ ifeq ($(HAVE_FRONTEND),true)
 	# Install vst plugin
 	install -d $(DESTDIR)$(LIBDIR)/vst/carla.vst
 
-	install -m 644 \
-		bin/CarlaRack*.* \
-		bin/CarlaPatchbay*.* \
-		$(DESTDIR)$(LIBDIR)/vst/carla.vst
+	@vst2files=$$(ls bin/CarlaRack*.* bin/CarlaPatchbay*.* 2>/dev/null); \
+	if [ -n "$$vst2files" ]; then \
+		install -m 644 $$vst2files $(DESTDIR)$(LIBDIR)/vst/carla.vst; \
+	fi
 
 	# Link binaries for vst plugin
 	@for i in `find $(DESTDIR)$(LIBDIR)/carla/ -maxdepth 1 -type f -exec basename {} ';'`; do \
