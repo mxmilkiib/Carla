@@ -722,6 +722,12 @@ def restoreGroupPositions(dataList):
             group.widgets[1].setPos(data['pos2x'], data['pos2y'])
             group.widgets[1].blockSignals(False)
 
+    if dataList:
+        cur = canvas.scene.sceneRect()
+        items_rect = canvas.scene.itemsBoundingRect()
+        if not cur.contains(items_rect):
+            canvas.scene.setSceneRect(cur.united(items_rect))
+
 def setGroupPos(group_id, group_pos_x, group_pos_y):
     setGroupPosFull(group_id, group_pos_x, group_pos_y, group_pos_x, group_pos_y)
 
