@@ -943,7 +943,10 @@ class HostWindow(QMainWindow):
     @pyqtSlot()
     def slot_fileOpen(self):
         fileFilter = self.tr("Carla Project File (*.carxp);;Carla Preset File (*.carxs)")
-        filename, ok = QFileDialog.getOpenFileName(self, self.tr("Open Carla Project File"), self.fSavedSettings[CARLA_KEY_MAIN_PROJECT_FOLDER], filter=fileFilter)
+        startDir = self.fSavedSettings[CARLA_KEY_MAIN_PROJECT_FOLDER]
+        if not os.path.isdir(startDir):
+            startDir = HOME
+        filename, ok = QFileDialog.getOpenFileName(self, self.tr("Open Carla Project File"), startDir, filter=fileFilter)
 
         # FIXME use ok value, test if it works as expected
         if not filename:
