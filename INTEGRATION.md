@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-03-29 (session 2)
+Last updated: 2026-03-30
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -102,9 +102,10 @@ Branches with dependencies on other local branches cannot be submitted upstream 
 
 ## Branch and Integration Status Outline
 
-**Summary**: 0 need attention, 0 awaiting review, 0 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
+**Summary**: 0 need attention, 0 awaiting review, 8 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
 
-Integration built 2026-03-27: merged all 14 open upstream PRs (#1397 port-groups, #1426 python-compileall, #1483 disconnect-group, #1483 unordered-events, #1555 handle-events, #1658 sigusr2-bridge, #1690 meson-build, #1734 pyqt-import-fix, #1748 pipewire-connections, #1975 vst-param-align, #1987 cygwin-fix, #2010 rack-ui-rework, #2011 osc-named-plugins, #2020 param-labels); fixed two build errors (d_msleep, DISTRHO::String::buffer()); build clean.
+Integration built 2026-03-29: merged all 14 open upstream PRs + 8 local feature/bugfix branches; build clean.
+Previous build 2026-03-27: merged all 14 open upstream PRs (#1397 port-groups, #1426 python-compileall, #1483 disconnect-group, #1483 unordered-events, #1555 handle-events, #1658 sigusr2-bridge, #1690 meson-build, #1734 pyqt-import-fix, #1748 pipewire-connections, #1975 vst-param-align, #1987 cygwin-fix, #2010 rack-ui-rework, #2011 osc-named-plugins, #2020 param-labels); fixed two build errors (d_msleep, DISTRHO::String::buffer()); build clean.
 
 ### Upstream PRs in Integration (merged to integrated, not yet to upstream/main)
 
@@ -137,9 +138,18 @@ These are upstream PRs that have been merged into `integrated` for local use. Th
 
 (none yet)
 
-### Local Only (No PR)
+### Local Only (No PR yet)
 
-(none yet)
+These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but no upstream PR has been filed.
+
+- [x] **bugfix/2026.03mar.29-lv2-program-changed-deadlock** — remove re-entrant lock in `handleProgramChanged` (#1968) — merged 2026-03-30
+- [x] **bugfix/2026.03mar.29-file-open-default-folder** — validate project folder before Open dialog (#2019) — merged 2026-03-30
+- [x] **bugfix/2026.03mar.29-qt6-precedence-over-qt5** — guard Qt5 detection so Qt6 wins on dual-Qt systems (#2031) — merged 2026-03-30
+- [x] **bugfix/2026.03mar.29-install-vst2-glob-guard** — shell-guard VST2 install glob in `make install` (#1991) — merged 2026-03-30
+- [x] **feature/2026.03mar.29-log-missing-plugin-uri** — include type/binary/label in missing-plugin error (#1499) — merged 2026-03-30
+- [x] **feature/2026.03mar.29-dsp-bar-refresh-rate** — independent DSP bar refresh timer + settings spinbox (#1482) — merged 2026-03-30
+- [x] **feature/2026.03mar.29-patchbay-canvas-autosize** — expand scene rect after restoring group positions (#1481) — merged 2026-03-30
+- [x] **feature/2026.03mar.29-patchbay-drag-scroll** — auto-scroll canvas during rubberband drag near edge (#1577) — merged 2026-03-30
 
 ### Merged to Upstream
 
@@ -151,7 +161,7 @@ These are upstream PRs that have been merged into `integrated` for local use. Th
 
 - Needs Attention (0 branches): (none)
 - Awaiting Review (0 branches): (none)
-- Local Development (0 branches): (none)
+- Local Development (8 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll
 - Secondary Patches (0 branches): (none)
 
 See **Feature Request Branch TODO** section at the end of this file for planned work.
