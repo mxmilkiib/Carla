@@ -826,7 +826,37 @@ include Makefile.print.mk
 
 # ---------------------------------------------------------------------------------------------------------------------
 
+generate-ui:
+ifeq ($(PYUIC),)
+	$(error PYUIC is not set; run make with Qt5 or Qt6 frontend dependencies installed)
+endif
+	@for ui in resources/ui/*.ui; do \
+		base=$$(basename "$$ui" .ui); \
+		out="source/frontend/ui_$${base}.py"; \
+		if [ -f "$$out" ]; then \
+			$(PYUIC) "$$ui" -o "$$out" && echo "  GEN $$out"; \
+		fi; \
+	done
+
+check:
+	@echo "  Checking Python syntax for frontend modules..."
+	@python3 -m py_compile \
+		source/frontend/carla_shared.py \
+		source/frontend/carla_host.py \
+		source/frontend/carla_settings.py \
+		source/frontend/carla_skin.py \
+		source/frontend/carla_widgets.py \
+		source/frontend/patchcanvas/patchcanvas.py \
+		source/frontend/patchcanvas/scene.py && echo "  OK"
+	@echo "  Checking generated UI files (pyuic version match)..."
+	@python3 -c "\
+import sys, importlib.util; \
+sys.path.insert(0,'source/frontend'); sys.path.insert(0,'bin'); \
+spec = importlib.util.spec_from_file_location('ui_carla_host','source/frontend/ui_carla_host.py'); \
+mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); \
+print('  UI import OK')"
+
 .FORCE:
-.PHONY: .FORCE
+.PHONY: .FORCE generate-ui check
 
 # ---------------------------------------------------------------------------------------------------------------------
