@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-03-30 (session 6)
+Last updated: 2026-03-30 (session 7)
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -102,9 +102,9 @@ Branches with dependencies on other local branches cannot be submitted upstream 
 
 ## Branch and Integration Status Outline
 
-**Summary**: 0 need attention, 0 awaiting review, 9 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
+**Summary**: 0 need attention, 0 awaiting review, 10 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
 
-Integration built 2026-03-30: merged all 14 open upstream PRs + 9 local feature/bugfix branches; build clean.
+Integration built 2026-03-30: merged all 14 open upstream PRs + 10 local feature/bugfix branches; build clean.
 Qt6 frontend active: `qt_config.py` regenerated to `qt = 6`; `make generate-ui` regenerates `ui_*.py` with `pyuic6`; `make check` verifies syntax + UI import; `make test` runs pytest suite (`tests/test_frontend.py`, 13 tests). Run workflow: `.windsurf/workflows/run-carla.md`.
 Previous build 2026-03-27: merged all 14 open upstream PRs (#1397 port-groups, #1426 python-compileall, #1483 disconnect-group, #1483 unordered-events, #1555 handle-events, #1658 sigusr2-bridge, #1690 meson-build, #1734 pyqt-import-fix, #1748 pipewire-connections, #1975 vst-param-align, #1987 cygwin-fix, #2010 rack-ui-rework, #2011 osc-named-plugins, #2020 param-labels); fixed two build errors (d_msleep, DISTRHO::String::buffer()); build clean.
 
@@ -152,6 +152,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 - [x] **feature/2026.03mar.29-patchbay-canvas-autosize** — expand scene rect after restoring group positions (#1481) — merged 2026-03-30
 - [x] **feature/2026.03mar.29-patchbay-drag-scroll** — auto-scroll canvas during rubberband drag near edge (#1577) — merged 2026-03-30
 - [x] **feature/2026.03mar.30-default-session-on-open** — load configured default project on startup when no CLI arg given (#1929) — merged 2026-03-30
+- [x] **bugfix/2026.03mar.30-lv2-native-scalepoints** — populate scalepoints in `CarlaEngineNative::getParameterInfo()` (#1976/#1984) — merged 2026-03-30
 
 ### Merged to Upstream
 
@@ -163,7 +164,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 
 - Needs Attention (0 branches): (none)
 - Awaiting Review (0 branches): (none)
-- Local Development (9 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open
+- Local Development (10 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open, lv2-native-scalepoints
 - Secondary Patches (0 branches): (none)
 
 See **Feature Request Branch TODO** section at the end of this file for planned work.
