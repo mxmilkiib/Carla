@@ -435,6 +435,35 @@
               </property>
              </widget>
             </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_main_dsp_refresh_interval">
+              <property name="text">
+               <string>DSP bar refresh interval:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QSpinBox" name="sb_main_dsp_refresh_interval">
+              <property name="suffix">
+               <string> ms</string>
+              </property>
+              <property name="minimum">
+               <number>100</number>
+              </property>
+              <property name="maximum">
+               <number>5000</number>
+              </property>
+              <property name="singleStep">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>1000</number>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="0" colspan="3">
              <widget class="QCheckBox" name="ch_main_show_logs">
               <property name="text">
