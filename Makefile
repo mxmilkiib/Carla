@@ -838,6 +838,9 @@ endif
 		fi; \
 	done
 
+test:
+	python3 -m pytest tests/ -v
+
 check:
 	@echo "  Checking Python syntax for frontend modules..."
 	@python3 -m py_compile \
@@ -857,6 +860,6 @@ mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); \
 print('  UI import OK')"
 
 .FORCE:
-.PHONY: .FORCE generate-ui check
+.PHONY: .FORCE generate-ui check test
 
 # ---------------------------------------------------------------------------------------------------------------------
