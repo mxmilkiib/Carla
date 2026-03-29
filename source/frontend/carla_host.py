@@ -684,6 +684,11 @@ class HostWindow(QMainWindow):
         if not (self.host.isControl or self.host.isPlugin):
             projectFile = getInitialProjectFile(QApplication.instance())
 
+            if not projectFile and not (NSM_URL and self.host.nsmOK):
+                defaultProject = self.fSavedSettings[CARLA_KEY_MAIN_DEFAULT_PROJECT]
+                if defaultProject and os.path.isfile(defaultProject):
+                    projectFile = defaultProject
+
             if projectFile:
                 self.loadProjectLater(projectFile)
 
@@ -2061,6 +2066,7 @@ class HostWindow(QMainWindow):
 
         self.fSavedSettings = {
             CARLA_KEY_MAIN_PROJECT_FOLDER:      settings.value(CARLA_KEY_MAIN_PROJECT_FOLDER,      CARLA_DEFAULT_MAIN_PROJECT_FOLDER,      str),
+            CARLA_KEY_MAIN_DEFAULT_PROJECT:     settings.value(CARLA_KEY_MAIN_DEFAULT_PROJECT,     CARLA_DEFAULT_MAIN_DEFAULT_PROJECT,     str),
             CARLA_KEY_MAIN_CONFIRM_EXIT:        settings.value(CARLA_KEY_MAIN_CONFIRM_EXIT,        CARLA_DEFAULT_MAIN_CONFIRM_EXIT,        bool),
             CARLA_KEY_MAIN_CLASSIC_SKIN:        settings.value(CARLA_KEY_MAIN_CLASSIC_SKIN,        CARLA_DEFAULT_MAIN_CLASSIC_SKIN,        bool),
             CARLA_KEY_MAIN_REFRESH_INTERVAL:    settings.value(CARLA_KEY_MAIN_REFRESH_INTERVAL,    CARLA_DEFAULT_MAIN_REFRESH_INTERVAL,    int),

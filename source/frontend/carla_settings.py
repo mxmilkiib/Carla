@@ -46,6 +46,7 @@ from carla_backend import (
 
 from carla_shared import (
     CARLA_KEY_MAIN_PROJECT_FOLDER,
+    CARLA_KEY_MAIN_DEFAULT_PROJECT,
     CARLA_KEY_MAIN_USE_PRO_THEME,
     CARLA_KEY_MAIN_PRO_THEME_COLOR,
     CARLA_KEY_MAIN_REFRESH_INTERVAL,
@@ -108,6 +109,7 @@ from carla_shared import (
     CARLA_KEY_EXPERIMENTAL_PREVENT_BAD_BEHAVIOUR,
     CARLA_KEY_EXPERIMENTAL_LOAD_LIB_GLOBAL,
     CARLA_DEFAULT_MAIN_PROJECT_FOLDER,
+    CARLA_DEFAULT_MAIN_DEFAULT_PROJECT,
     CARLA_DEFAULT_MAIN_USE_PRO_THEME,
     CARLA_DEFAULT_MAIN_PRO_THEME_COLOR,
     CARLA_DEFAULT_MAIN_REFRESH_INTERVAL,
@@ -628,6 +630,7 @@ class CarlaSettingsW(QDialog):
         self.ui.buttonBox.button(QDialogButtonBox.Reset).clicked.connect(self.slot_resetSettings)
 
         self.ui.b_main_proj_folder_open.clicked.connect(self.slot_getAndSetProjectPath)
+        self.ui.b_main_default_project_open.clicked.connect(self.slot_getAndSetDefaultProject)
 
         self.ui.cb_engine_audio_driver.currentIndexChanged.connect(self.slot_engineAudioDriverChanged)
         self.ui.tb_engine_driver_config.clicked.connect(self.slot_showAudioDriverSettings)
@@ -696,6 +699,9 @@ class CarlaSettingsW(QDialog):
 
         self.ui.le_main_proj_folder.setText(
             settings.value(CARLA_KEY_MAIN_PROJECT_FOLDER, CARLA_DEFAULT_MAIN_PROJECT_FOLDER, str))
+
+        self.ui.le_main_default_project.setText(
+            settings.value(CARLA_KEY_MAIN_DEFAULT_PROJECT, CARLA_DEFAULT_MAIN_DEFAULT_PROJECT, str))
 
         self.ui.ch_main_theme_pro.setChecked(self.ui.group_main_theme.isEnabled() and
                                              settings.value(CARLA_KEY_MAIN_USE_PRO_THEME,
@@ -992,6 +998,7 @@ class CarlaSettingsW(QDialog):
         # Main
 
         settings.setValue(CARLA_KEY_MAIN_PROJECT_FOLDER,   self.ui.le_main_proj_folder.text())
+        settings.setValue(CARLA_KEY_MAIN_DEFAULT_PROJECT,   self.ui.le_main_default_project.text())
         settings.setValue(CARLA_KEY_MAIN_CONFIRM_EXIT,     self.ui.ch_main_confirm_exit.isChecked())
         settings.setValue(CARLA_KEY_MAIN_CLASSIC_SKIN,     self.ui.cb_main_classic_skin_default.isChecked())
         settings.setValue(CARLA_KEY_MAIN_USE_PRO_THEME,    self.ui.ch_main_theme_pro.isChecked())
@@ -1189,6 +1196,7 @@ class CarlaSettingsW(QDialog):
 
         if currentRow == self.TAB_INDEX_MAIN:
             self.ui.le_main_proj_folder.setText(CARLA_DEFAULT_MAIN_PROJECT_FOLDER)
+            self.ui.le_main_default_project.setText(CARLA_DEFAULT_MAIN_DEFAULT_PROJECT)
             self.ui.ch_main_theme_pro.setChecked(CARLA_DEFAULT_MAIN_USE_PRO_THEME and
                                                  self.ui.group_main_theme.isEnabled())
             self.ui.cb_main_theme_color.setCurrentIndex(
@@ -1453,6 +1461,15 @@ class CarlaSettingsW(QDialog):
     def slot_getAndSetProjectPath(self):
         # FIXME
         getAndSetPath(self, self.ui.le_main_proj_folder)
+
+    @pyqtSlot()
+    def slot_getAndSetDefaultProject(self):
+        fileFilter = self.tr("Carla Project File (*.carxp);;Carla Preset File (*.carxs)")
+        filename, _ = QFileDialog.getOpenFileName(self, self.tr("Select Default Project File"),
+                                                  self.ui.le_main_proj_folder.text(),
+                                                  filter=fileFilter)
+        if filename:
+            self.ui.le_main_default_project.setText(filename)
 
     # -----------------------------------------------------------------------------------------------------------------
 
