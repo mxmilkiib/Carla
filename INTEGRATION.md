@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-03-29
+Last updated: 2026-03-29 (session 2)
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -344,7 +344,7 @@ Difficulty:
 
 ### Bugfixes (all authors)
 
-Items ordered: LV2 deadlock first (crash risk), then open dialog (UX regression).
+Items ordered: crash risk first, then build/install, then UX regressions.
 
 - [x] **[#1968](https://github.com/falktx/Carla/issues/1968) — LV2 `program_changed` deadlock when index == -1** `[easy]`
   - `handleProgramChanged(-1)` took `ScopedSingleProcessLocker`, then called `reloadPrograms`
@@ -359,6 +359,28 @@ Items ordered: LV2 deadlock first (crash risk), then open dialog (UX regression)
   - Fix: validate `CARLA_KEY_MAIN_PROJECT_FOLDER` with `os.path.isdir`; fall back to `HOME`.
   - Files: `source/frontend/carla_host.py` (`slot_fileOpen`)
   - Branch: `bugfix/2026.03mar.29-file-open-default-folder`
+
+- [x] **[#2031](https://github.com/falktx/Carla/issues/2031) — Qt5 selected over Qt6 when both are present** `[easy]`
+  - `Makefile.deps.mk` set `FRONTEND_TYPE = 6` first, then unconditionally overwrote it with
+    `FRONTEND_TYPE = 5` if Qt5 was also found — Qt5 always won on dual-Qt systems.
+  - Fix: guard the Qt5 block with `ifeq ($(FRONTEND_TYPE),)` so it only runs when Qt6 was not
+    selected. Qt5 standard support ended May 2025.
+  - Files: `source/Makefile.deps.mk`
+  - Branch: `bugfix/2026.03mar.29-qt6-precedence-over-qt5`
+
+- [x] **[#1991](https://github.com/falktx/Carla/issues/1991) — `make install` aborts on missing VST2 glob** `[easy]`
+  - `install -m 644 bin/CarlaRack*.* bin/CarlaPatchbay*.*` fails with "cannot stat" when those
+    files were not built (Linux without cross-compiled WIN32 VST2 binaries).
+  - Fix: replace bare glob with a shell conditional that skips the install if no files match.
+  - Files: `Makefile` (`install_main` target)
+  - Branch: `bugfix/2026.03mar.29-install-vst2-glob-guard`
+
+- [ ] **[#1917](https://github.com/falktx/Carla/issues/1917) — FTBFS on GCC-14** `[medium]`
+  - Build fails on GCC-14 (Ubuntu Oracular). Likely strict implicit-int or incompatible-pointer
+    errors from deprecated GCC-14 behaviour. Build log at launchpad (gzipped).
+  - Fix: fetch log, identify offending translation units, add `-Wno-*` guards or fix code.
+  - Files: TBD after reading build log
+  - Suggested branch: `bugfix/YYYY.MMmon.DD-gcc14-build-errors`
 
 ---
 
@@ -415,15 +437,25 @@ embedded plugin UI tab (hard platform work).
     `source/frontend/carla_settings.py`, `resources/ui/carla_settings.ui`
   - Branch: `feature/2026.03mar.29-dsp-bar-refresh-rate`
 
-- [ ] **[#1923](https://github.com/falktx/Carla/issues/1923) — Show dry/wet and volume knobs on minimised plugin slots** `[easy]`
+- [ ] **[#1923](https://github.com/falktx/Carla/issues/1923) — Show dry/wet and volume knobs on minimised plugin slots** `[medium]`
   - Users with long racks keep most plugins minimised. Dry/wet and volume are the only controls
-    they need, but currently require expanding the slot.
-  - Fix: expose the skin-tweak key `WetVolOnCompact` (already present in
-    `CARLA_DEFAULT_MAIN_SKIN_TWEAKS`) in the settings UI as a checkbox so it can be toggled
-    without editing the tweaks string manually.
-  - Files: `source/frontend/carla_settings.py`, `resources/ui/carla_settings.ui`,
-    `source/frontend/carla_skin.py` (verify knob visibility logic uses the key)
+    they need but currently require expanding the slot.
+  - The compact plugin UI (`carla_plugin_compact.ui`) does not contain knob widgets; adding them
+    requires redesigning the compact UI, adding knob instances in the Python class, and wiring
+    them to the existing parameter update path.
+  - Files: `resources/ui/carla_plugin_compact.ui`, `source/frontend/carla_skin.py`
+    (compact slot class), `source/frontend/carla_widgets.py` (parameter hooks)
   - Suggested branch: `feature/YYYY.MMmon.DD-compact-slot-wet-vol-knobs`
+
+- [ ] **[#1929](https://github.com/falktx/Carla/issues/1929) — Load a default session automatically on startup** `[medium]`
+  - Allow users to configure a default `.carxp` file that is loaded whenever Carla starts with
+    no command-line project argument.
+  - Fix: add `CARLA_KEY_MAIN_DEFAULT_PROJECT` to `carla_shared.py`; add a file-picker line in
+    the Main settings tab; in `carla_host.py` `__init__` (or the startup path), check the key
+    and call `slot_fileOpen` / `loadProjectNow` if set and the file exists.
+  - Files: `source/frontend/carla_shared.py`, `source/frontend/carla_host.py`,
+    `source/frontend/carla_settings.py`, `resources/ui/carla_settings.ui`
+  - Suggested branch: `feature/YYYY.MMmon.DD-default-session-on-open`
 
 - [ ] **[#1559](https://github.com/falktx/Carla/issues/1559) — Per-plugin LV2 UI selector** `[medium]`
   - `CarlaPluginLV2` already enumerates all UIs in `fRdfDescriptor->UIs` and picks one
