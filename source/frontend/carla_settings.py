@@ -1217,7 +1217,7 @@ class CarlaSettingsW(QDialog):
             self.ui.sb_main_refresh_interval.setValue(CARLA_DEFAULT_MAIN_REFRESH_INTERVAL)
             self.ui.sb_main_dsp_refresh_interval.setValue(CARLA_DEFAULT_MAIN_DSP_REFRESH_INTERVAL)
             self.ui.ch_main_confirm_exit.setChecked(CARLA_DEFAULT_MAIN_CONFIRM_EXIT)
-            self.ui.cb_main_classic_skin_default(CARLA_DEFAULT_MAIN_CLASSIC_SKIN)
+            self.ui.cb_main_classic_skin_default.setChecked(CARLA_DEFAULT_MAIN_CLASSIC_SKIN)
             self.ui.ch_main_show_logs.setChecked(CARLA_DEFAULT_MAIN_SHOW_LOGS)
 
         # -------------------------------------------------------------------------------------------------------------

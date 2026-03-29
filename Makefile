@@ -839,7 +839,7 @@ endif
 	done
 
 test:
-	python3 -m pytest tests/ -v
+	QT_QPA_PLATFORM=offscreen python3 -m pytest tests/ -v
 
 check:
 	@echo "  Checking Python syntax for frontend modules..."
