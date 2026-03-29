@@ -185,6 +185,7 @@ CANVAS_EYECANDY_SMALL     = 1
 # Carla Settings keys
 
 CARLA_KEY_MAIN_PROJECT_FOLDER   = "Main/ProjectFolder"   # str
+CARLA_KEY_MAIN_DEFAULT_PROJECT  = "Main/DefaultProject"  # str
 CARLA_KEY_MAIN_USE_PRO_THEME    = "Main/UseProTheme"     # bool
 CARLA_KEY_MAIN_PRO_THEME_COLOR  = "Main/ProThemeColor"   # str
 CARLA_KEY_MAIN_SKIN_TWEAKS          = "Main/SkinTweaks"          # str
@@ -270,6 +271,7 @@ CARLA_KEY_CUSTOM_PAINTING = "UseCustomPainting" # bool
 
 # Main
 CARLA_DEFAULT_MAIN_PROJECT_FOLDER   = HOME
+CARLA_DEFAULT_MAIN_DEFAULT_PROJECT  = ""
 CARLA_DEFAULT_MAIN_USE_PRO_THEME    = True
 CARLA_DEFAULT_MAIN_PRO_THEME_COLOR  = "Black"
 CARLA_DEFAULT_MAIN_REFRESH_INTERVAL     = 20
