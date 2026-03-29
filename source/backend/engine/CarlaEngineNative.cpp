@@ -986,8 +986,24 @@ protected:
             param.ranges.step = paramRanges.step;
             param.ranges.stepSmall = paramRanges.stepSmall;
             param.ranges.stepLarge = paramRanges.stepLarge;
-            param.scalePointCount = 0; // TODO
-            param.scalePoints = nullptr;
+
+            static NativeParameterScalePoint staticScalePoints[128];
+            static char staticScalePointLabels[128][STR_MAX+1];
+
+            {
+                const uint32_t spCount = plugin->getParameterScalePointCount(rindex);
+                const uint32_t spUsable = spCount < 128u ? spCount : 128u;
+                for (uint32_t sp = 0; sp < spUsable; ++sp)
+                {
+                    staticScalePoints[sp].value = plugin->getParameterScalePointValue(rindex, sp);
+                    if (plugin->getParameterScalePointLabel(rindex, sp, staticScalePointLabels[sp]))
+                        staticScalePoints[sp].label = staticScalePointLabels[sp];
+                    else
+                        staticScalePoints[sp].label = "";
+                }
+                param.scalePointCount = spUsable;
+                param.scalePoints     = spUsable > 0 ? staticScalePoints : nullptr;
+            }
 
             return &param;
         }
