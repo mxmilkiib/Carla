@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-03-30 (session 5)
+Last updated: 2026-03-30 (session 6)
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -105,7 +105,7 @@ Branches with dependencies on other local branches cannot be submitted upstream 
 **Summary**: 0 need attention, 0 awaiting review, 9 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
 
 Integration built 2026-03-30: merged all 14 open upstream PRs + 9 local feature/bugfix branches; build clean.
-Qt6 frontend active: `qt_config.py` regenerated to `qt = 6`; `make generate-ui` regenerates `ui_*.py` with `pyuic6`; `make check` verifies syntax + UI import; `make test` runs pytest suite (`tests/test_frontend.py`, 4 tests). Run workflow: `.windsurf/workflows/run-carla.md`.
+Qt6 frontend active: `qt_config.py` regenerated to `qt = 6`; `make generate-ui` regenerates `ui_*.py` with `pyuic6`; `make check` verifies syntax + UI import; `make test` runs pytest suite (`tests/test_frontend.py`, 13 tests). Run workflow: `.windsurf/workflows/run-carla.md`.
 Previous build 2026-03-27: merged all 14 open upstream PRs (#1397 port-groups, #1426 python-compileall, #1483 disconnect-group, #1483 unordered-events, #1555 handle-events, #1658 sigusr2-bridge, #1690 meson-build, #1734 pyqt-import-fix, #1748 pipewire-connections, #1975 vst-param-align, #1987 cygwin-fix, #2010 rack-ui-rework, #2011 osc-named-plugins, #2020 param-labels); fixed two build errors (d_msleep, DISTRHO::String::buffer()); build clean.
 
 ### Upstream PRs in Integration (merged to integrated, not yet to upstream/main)
