@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-03-27 21:25
+Last updated: 2026-03-29
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -305,10 +305,34 @@ Update the summary line at the top when adding/removing branches:
 
 ---
 
-## Feature Request Branch TODO
+## Qt6 Status
 
-Open issues filed by mxmilkiib on `falktx/Carla`, ordered within each section by importance then hardness (easiest first).
+Upstream (`falktx/Carla` `main`) is actively merging Qt6 compatibility:
+- `qt_compat.py` and per-file PyQt5/PyQt6 conditional imports already in place across the frontend.
+- Recent upstream commits: *"Import qt6 fixes from ui-rework branch"*, *"Fix QGLWidget import for PyQt6"*,
+  *"Fix carla-plugin embed usage in Qt6"*.
+- No separate local Qt6-prep branch is needed; stay current with `upstream/main`.
+- When adding new frontend code, follow the existing pattern in `qt_compat.py`:
+  import from whichever PyQt version is active (`qt_config == 5` / `qt_config == 6`).
+
+---
+
+## Upstream Branches to Watch
+
+- **`rack-ui-rework`** (falktx) — 11 commits ahead of main (last: 2025-08-03). Imports jpka's rack
+  UI rework, removes the "forth" API, and carries Qt6 fixes not yet on main. Worth merging to
+  `integrated` once it stabilises. Monitor for merge.
+- **`custom-patchbay-ports`** (falktx, 2017) — 2 commits: adds configurable audio/midi port counts
+  to Carla-Patchbay via `CarlaEngineJack.cpp`. Old and likely bitrotted, but the concept is still
+  open. Noted for reference only; not suitable for `integrated` as-is.
+
+---
+
+## Feature Request / Bugfix Branch TODO
+
+Issues filed on `falktx/Carla`, ordered within each section by importance then hardness.
 PRs target `mxmilkiib/Carla` before `falktx/Carla`.
+`[x]` = branch created, pushed to `mxmilkiib/Carla`, ready to submit upstream.
 
 Difficulty:
 - `[easy]` — 1–2 files, contained, well-understood path
@@ -318,30 +342,45 @@ Difficulty:
 
 ---
 
+### Bugfixes (all authors)
+
+Items ordered: LV2 deadlock first (crash risk), then open dialog (UX regression).
+
+- [x] **[#1968](https://github.com/falktx/Carla/issues/1968) — LV2 `program_changed` deadlock when index == -1** `[easy]`
+  - `handleProgramChanged(-1)` took `ScopedSingleProcessLocker`, then called `reloadPrograms`
+    which calls `setMidiProgram`, which takes the same lock — deadlock.
+  - Fix: removed the outer lock; `setMidiProgram` protects itself internally.
+  - Files: `source/backend/plugin/CarlaPluginLV2.cpp` (`handleProgramChanged`)
+  - Branch: `bugfix/2026.03mar.29-lv2-program-changed-deadlock`
+
+- [x] **[#2019](https://github.com/falktx/Carla/issues/2019) — "Open" dialog ignores default project folder** `[easy]`
+  - On first open after launch, the file dialog could revert to the OS default if the configured
+    project folder no longer exists (deleted, unmounted drive).
+  - Fix: validate `CARLA_KEY_MAIN_PROJECT_FOLDER` with `os.path.isdir`; fall back to `HOME`.
+  - Files: `source/frontend/carla_host.py` (`slot_fileOpen`)
+  - Branch: `bugfix/2026.03mar.29-file-open-default-folder`
+
+---
+
 ### Patchbay / Canvas
 
 Items ordered: canvas-size first (high impact, easy), then drag-scroll (UX), then sub-rack (hard).
 
-- [ ] **[#1481](https://github.com/falktx/Carla/issues/1481) — Canvas size not persisted; imported projects clip** `[easy]`
+- [x] **[#1481](https://github.com/falktx/Carla/issues/1481) — Canvas size not persisted; imported projects clip** `[easy]`
   - When a project is loaded whose canvas boxes extend beyond the current scene rect, they are
     silently clipped or lost. The canvas has no persistence of its scene size.
-  - Fix: on `loadProject`, after restoring group positions, call `scene.setSceneRect` to encompass
-    all restored group bounding boxes. Optionally, store the canvas rect in the project XML so it
-    round-trips exactly.
-  - Files: `source/frontend/patchcanvas/patchcanvas.py` (`restoreGroupPositions`) +
-    `source/frontend/carla_host.py` (`projectLoadingFinished`)
-  - Suggested branch: `feature/YYYY.MMmon.DD-patchbay-canvas-autosize`
+  - Fix: in `restoreGroupPositions`, after setting all positions, call `scene.setSceneRect` with
+    `cur.united(scene.itemsBoundingRect())` if any item falls outside the current rect.
+  - Files: `source/frontend/patchcanvas/patchcanvas.py` (`restoreGroupPositions`)
+  - Branch: `feature/2026.03mar.29-patchbay-canvas-autosize`
 
-- [ ] **[#1577](https://github.com/falktx/Carla/issues/1577) — Patchbay: auto-scroll canvas during drag near edge** `[medium]`
-  - When dragging to create a rubberband selection or a connection, the canvas does not scroll if
-    the cursor approaches the viewport edge. The user must stop, scroll manually, and resume.
-  - Fix: in `scene.py` `mouseMoveEvent`, when `m_mouse_rubberband` is active, map the scene
-    position to viewport coordinates (`m_view.mapFromScene`); if within a threshold band (e.g.
-    30 px) of the viewport edge, call `m_view.horizontalScrollBar().setValue()` /
-    `m_view.verticalScrollBar().setValue()` by a proportional step each tick. A `QTimer` or the
-    existing `timerEvent` cadence can drive the scroll when the mouse is held near the edge.
-  - Files: `source/frontend/patchcanvas/scene.py` (`mouseMoveEvent`, `mouseReleaseEvent`)
-  - Suggested branch: `feature/YYYY.MMmon.DD-patchbay-drag-scroll`
+- [x] **[#1577](https://github.com/falktx/Carla/issues/1577) — Patchbay: auto-scroll canvas during drag near edge** `[medium]`
+  - When dragging a rubberband selection, the canvas does not scroll when the cursor approaches
+    the viewport edge.
+  - Fix: in `mouseMoveEvent`, when `m_mouse_rubberband` is active, map scene pos to viewport
+    coords; if within 30 px of any edge, step scroll bars proportionally.
+  - Files: `source/frontend/patchcanvas/scene.py` (`mouseMoveEvent`)
+  - Branch: `feature/2026.03mar.29-patchbay-drag-scroll`
 
 - [ ] **[#1353](https://github.com/falktx/Carla/issues/1353) — Display sub carla-rack plugin graph in patchbay** `[arch]`
   - When a Carla-Rack is loaded as a plugin, expose its internal plugin graph as an expandable
@@ -356,54 +395,61 @@ Items ordered: canvas-size first (high impact, easy), then drag-scroll (UX), the
 
 ### UI / Plugin Management
 
-Items ordered: log missing URI (trivial debugging win), DSP refresh decoupling, LV2 UI picker,
+Items ordered: log missing URI, DSP refresh, minimised-plugin knobs, LV2 UI picker,
 embedded plugin UI tab (hard platform work).
 
-- [ ] **[#1499](https://github.com/falktx/Carla/issues/1499) — Log the URI/filename of missing plugin clients** `[easy]`
-  - When a project loads and a plugin cannot be found, the log only shows the client name. The
-    plugin URI or file path should also appear so the user knows exactly what is missing.
-  - Fix: in the plugin loading failure path (bridge init or `addPlugin` fail), call
-    `carla_stderr`/`engine->callback(ENGINE_CALLBACK_ERROR, ...)` including the plugin URI or
-    filename from the plugin info struct alongside the existing error text.
-  - Files: `source/backend/engine/CarlaEngine.cpp` (project load path) and/or
-    `source/backend/plugin/CarlaPluginBridge.cpp` (bridge init failure)
-  - Suggested branch: `feature/YYYY.MMmon.DD-log-missing-plugin-uri`
+- [x] **[#1499](https://github.com/falktx/Carla/issues/1499) — Log the URI/filename of missing plugin clients** `[easy]`
+  - When a project loads and a plugin cannot be found, the log only shows the client name.
+  - Fix: added plugin type, binary path, and label/URI to the `carla_stderr2` call in
+    `CarlaEngine::loadProject` on load failure.
+  - Files: `source/backend/engine/CarlaEngine.cpp` (project load path)
+  - Branch: `feature/2026.03mar.29-log-missing-plugin-uri`
 
-- [ ] **[#1482](https://github.com/falktx/Carla/issues/1482) — Decouple DSP bar refresh rate from engine idle interval** `[easy]`
-  - `CARLA_KEY_MAIN_REFRESH_INTERVAL` (default 20 ms) already exists and is exposed in the
-    settings dialog (`sb_main_refresh_interval`). However, it controls both `fIdleTimerFast`
-    (engine idle, latency-sensitive) and `fIdleTimerSlow` (`= fast * 4`, DSP bar + plugin slow
-    idle). Slowing the fast timer to 1 s to reduce DSP bar flicker would break engine idle.
-  - Fix: add a separate `CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL` setting (default 1000 ms); drive a
-    third timer `fIdleTimerDsp` for `getAndRefreshRuntimeInfo` only; move it out of `idleSlow` so
-    the existing slow timer keeps its engine-idle role.
-  - Files: `source/frontend/carla_shared.py` (new key + default), `source/frontend/carla_host.py`
-    (`startTimers`, `killTimers`, `restartTimersIfNeeded`, `timerEvent`, `idleSlow`),
-    `source/frontend/carla_settings.py` (new spinbox)
-  - Suggested branch: `feature/YYYY.MMmon.DD-dsp-bar-refresh-rate`
+- [x] **[#1482](https://github.com/falktx/Carla/issues/1482) — Decouple DSP bar refresh rate from engine idle interval** `[easy]`
+  - `CARLA_KEY_MAIN_REFRESH_INTERVAL` controlled both `fIdleTimerFast` (engine idle) and
+    `fIdleTimerSlow` (DSP bar + plugin slow idle). Slowing it for a calm DSP bar would break
+    engine idle.
+  - Fix: added `CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL` (default 1000 ms) and a third timer
+    `fIdleTimerDsp` driving `getAndRefreshRuntimeInfo` only. New spinbox in settings.
+  - Files: `source/frontend/carla_shared.py`, `source/frontend/carla_host.py`,
+    `source/frontend/carla_settings.py`, `resources/ui/carla_settings.ui`
+  - Branch: `feature/2026.03mar.29-dsp-bar-refresh-rate`
+
+- [ ] **[#1923](https://github.com/falktx/Carla/issues/1923) — Show dry/wet and volume knobs on minimised plugin slots** `[easy]`
+  - Users with long racks keep most plugins minimised. Dry/wet and volume are the only controls
+    they need, but currently require expanding the slot.
+  - Fix: expose the skin-tweak key `WetVolOnCompact` (already present in
+    `CARLA_DEFAULT_MAIN_SKIN_TWEAKS`) in the settings UI as a checkbox so it can be toggled
+    without editing the tweaks string manually.
+  - Files: `source/frontend/carla_settings.py`, `resources/ui/carla_settings.ui`,
+    `source/frontend/carla_skin.py` (verify knob visibility logic uses the key)
+  - Suggested branch: `feature/YYYY.MMmon.DD-compact-slot-wet-vol-knobs`
 
 - [ ] **[#1559](https://github.com/falktx/Carla/issues/1559) — Per-plugin LV2 UI selector** `[medium]`
   - `CarlaPluginLV2` already enumerates all UIs in `fRdfDescriptor->UIs` and picks one
     automatically by priority (lines 7039–7157 in `CarlaPluginLV2.cpp`). There is no way for the
-    user to override the selection — e.g. choosing a text-based UI (Vim for Moony.lv2) or a UI
-    built with XUiDesigner.
+    user to override the selection.
   - Fix: expose the UI index as a per-plugin setting; add a "Choose UI…" entry to the plugin
-    context menu in the frontend; pass the chosen index through the plugin options API to
-    `CarlaPluginLV2::ui_show`, storing it in the plugin state.
+    context menu; pass the chosen index to `CarlaPluginLV2::ui_show`, storing it in plugin state.
   - Files: `source/backend/plugin/CarlaPluginLV2.cpp` (UI selection, `ui_show`),
-    `source/frontend/carla_widgets.py` or `carla_skin.py` (context menu),
-    `source/frontend/carla_host.py` (slot for UI choice action)
+    `source/frontend/carla_widgets.py` or `carla_skin.py` (context menu)
   - Suggested branch: `feature/YYYY.MMmon.DD-lv2-ui-selection`
 
+- [ ] **[#1976](https://github.com/falktx/Carla/issues/1976) — LV2 scalePoints lost when bridge mode enabled** `[medium]`
+  - For some plugins, `lv2:scalePoint` entries are stripped when "Run plugins in bridge mode" is
+    active. The bridge serialiser sends only the value range, discarding point labels.
+  - Fix: trace the LV2 plugin info serialisation in the bridge path; ensure `LV2_RDF_PortScalePoint`
+    array is included in the binary descriptor sent across the bridge pipe.
+  - Files: `source/backend/plugin/CarlaPluginLV2.cpp` (bridge descriptor build),
+    `source/backend/utils/CarlaStateUtils.cpp` or bridge pipe protocol
+  - Suggested branch: `bugfix/YYYY.MMmon.DD-lv2-bridge-scalepoints`
+
 - [ ] **[#1523](https://github.com/falktx/Carla/issues/1523) — Option to embed plugin UIs as a tab inside Carla** `[hard]`
-  - Plugin UIs currently open as floating windows. Optionally embedding them into a tab in the
-    Carla main window would improve workflow for users who prefer a contained layout.
-  - Requires XEmbed (X11) or `xdg-foreign` / Wayland foreign toplevel protocol; the bridge UI
-    layer already exists but embedding a native window into a `QWidget` tab is non-trivial and
-    differs significantly between X11 and Wayland. Wayland support may not be possible without
-    compositor cooperation.
-  - Files: `source/frontend/` (new tab widget), bridge UI layer
-    (`source/bridges-ui/CarlaBridgeUI.cpp`), `source/backend/plugin/CarlaPlugin.cpp` (UI show)
+  - Plugin UIs currently open as floating windows.
+  - Requires XEmbed (X11) or Wayland foreign-toplevel; the bridge UI layer exists but embedding
+    a native window into a `QWidget` tab differs significantly between X11 and Wayland.
+  - Files: `source/frontend/` (new tab widget), `source/bridges-ui/CarlaBridgeUI.cpp`,
+    `source/backend/plugin/CarlaPlugin.cpp`
   - Suggested branch: `feature/YYYY.MMmon.DD-embed-plugin-ui-tab`
 
 ---
@@ -414,23 +460,27 @@ Items ordered: metadata icons (C++/Python, self-contained), PipeWire volumes (ne
 
 - [ ] **[#1576](https://github.com/falktx/Carla/issues/1576) — Display JACK client metadata icons in patchbay** `[medium]`
   - The JACK metadata API (`jack_get_property` / `JACK_METADATA_ICON_SMALL`) allows clients to
-    advertise icon paths. Carla's patchbay could retrieve and render these icons on canvas boxes,
-    matching behaviour seen in other JACK patchbays (Catia, Patchage). See also seq66#75.
-  - Fix: in `CarlaEngineJack.cpp`, when a client registers (`handleJackClientRegistrationCallback`)
-    query `jack_get_property(uuid, JACK_METADATA_ICON_SMALL, &value, &type)`; pass the icon path
-    through the patchbay callback to Python; load and render the icon in `canvasbox.py`.
-  - Requires JACK2 ≥ 1.9.9 (metadata API). Should be guarded by `#ifdef HAVE_JACK_METADATA`.
+    advertise icon paths. Carla's patchbay could render these on canvas boxes.
+  - Fix: query `jack_get_property` on client registration; pass icon path through patchbay
+    callback to Python; render in `canvasbox.py`. Guard with `#ifdef HAVE_JACK_METADATA`.
   - Files: `source/backend/engine/CarlaEngineJack.cpp`,
     `source/frontend/patchcanvas/canvasbox.py`, `source/frontend/carla_host.py` (callback slot)
   - Suggested branch: `feature/YYYY.MMmon.DD-jack-metadata-icons`
 
+- [ ] **[#1927](https://github.com/falktx/Carla/issues/1927) — Auto-follow engine sample rate changes** `[medium]`
+  - When the JACK/PipeWire graph sample rate changes (e.g. switching between 48 kHz and 96 kHz
+    in a DAW), Carla does not reconfigure automatically.
+  - Fix: subscribe to the JACK `JackSampleRateCallback` in `CarlaEngineJack.cpp`; post a
+    postponed event that triggers `pData->engine->updateBufferSize` / `updateSampleRate`;
+    propagate to the frontend via `ENGINE_CALLBACK_SAMPLE_RATE_CHANGED`.
+  - Files: `source/backend/engine/CarlaEngineJack.cpp`, possibly `carla_host.py` for UI update
+  - Suggested branch: `feature/YYYY.MMmon.DD-jack-follow-sample-rate`
+
 - [ ] **[#1368](https://github.com/falktx/Carla/issues/1368) — Control PipeWire client volumes from patchbay** `[hard]`
-  - PipeWire assigns a volume control to every JACK client at the session manager level. Carla's
-    patchbay could expose these as a gain slider or context-menu item on each canvas box.
-  - The JACK API has no volume concept; accessing PipeWire volumes requires the native PipeWire
-    API (`pw_core`, `pw_registry`, `spa_node` props). This would need a separate PipeWire helper
-    that runs alongside the JACK client, detects PW node IDs for each JACK client name, and
-    applies `SPA_PROP_channelVolumes`. Guard with `#ifdef HAVE_PIPEWIRE`.
+  - PipeWire assigns a volume control to every JACK client. Carla's patchbay could expose these
+    as a gain slider or context-menu item.
+  - JACK API has no volume concept; requires native PipeWire API (`pw_core`, `pw_registry`,
+    `SPA_PROP_channelVolumes`). Guard with `#ifdef HAVE_PIPEWIRE`.
   - Files: new `source/backend/engine/CarlaPipeWireHelper.cpp`, `CarlaEngineJack.cpp`,
     patchcanvas context menu
   - Suggested branch: `feature/YYYY.MMmon.DD-pipewire-client-volumes`
@@ -440,11 +490,8 @@ Items ordered: metadata icons (C++/Python, self-contained), PipeWire volumes (ne
 ### Platform / Infrastructure
 
 - [ ] **[#1533](https://github.com/falktx/Carla/issues/1533) — WSL2 bridge for Linux plugins on Windows** `[arch]`
-  - Run Linux plugins on Windows by routing plugin IPC through a WSL2 instance. Would require a
-    new bridge transport layer over a named pipe or Unix socket between the Windows host and the
-    Linux WSL2 guest, plus a Linux-side bridge binary.
-  - This is an entirely new infrastructure component; out of scope for a simple feature branch.
-    Noted here for completeness only.
+  - Run Linux plugins on Windows by routing plugin IPC through a WSL2 instance. Entirely new
+    infrastructure component; out of scope for a simple feature branch. Noted for completeness.
 
 ---
 
