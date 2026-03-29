@@ -3162,7 +3162,12 @@ bool CarlaEngine::loadProjectInternal(water::XmlDocument& xmlDoc, const bool alw
             }
             else
             {
-                carla_stderr2("Failed to load a plugin '%s', error was:\n%s", stateSave.name, getLastError());
+                carla_stderr2("Failed to load a plugin '%s' (type: %s, binary: %s, label/uri: %s), error was:\n%s",
+                             stateSave.name,
+                             stateSave.type   != nullptr && stateSave.type[0]   != '\0' ? stateSave.type   : "?",
+                             stateSave.binary != nullptr && stateSave.binary[0] != '\0' ? stateSave.binary : "none",
+                             stateSave.label  != nullptr && stateSave.label[0]  != '\0' ? stateSave.label  : "none",
+                             getLastError());
             }
 
             if (! isPreset)
