@@ -1069,6 +1069,28 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="w_plugins">
+         <attribute name="title">
+          <string>Plugins</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_plugins">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+         </layout>
+        </widget>
        </widget>
       </widget>
      </item>

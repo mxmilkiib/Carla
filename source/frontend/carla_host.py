@@ -105,6 +105,7 @@ from carla_widgets import *
 from patchcanvas import patchcanvas
 from widgets.digitalpeakmeter import DigitalPeakMeter
 from widgets.pixmapkeyboard import PixmapKeyboardHArea
+from carla_plugin_browser import MIME_PLUGIN_INFO, PluginBrowserWidget
 
 # ------------------------------------------------------------------------------------------------------------
 # Try Import OpenGL
@@ -206,6 +207,8 @@ class HostWindow(QMainWindow):
         self.fPluginList  = []
 
         self.fPluginListDialog = None
+        self.fPluginBrowser      = None
+        self.fPendingPluginDropPos = None
         self.fFavoritePlugins = []
 
         self.fProjectFilename  = ""
@@ -494,6 +497,13 @@ class HostWindow(QMainWindow):
                 self.ui.graphicsView.setViewport(self.ui.glView)
 
             self.setupCanvas()
+
+            # Plugin browser sidebar
+            self.fPluginBrowser = PluginBrowserWidget(self.ui.w_plugins)
+            self.ui.verticalLayout_plugins.addWidget(self.fPluginBrowser)
+            self.fPluginBrowser.pluginActivated.connect(self.slot_addPluginFromBrowser)
+            self.ui.graphicsView.setAcceptDrops(True)
+            self.ui.graphicsView.installEventFilter(self)
 
         # ----------------------------------------------------------------------------------------------------
         # Set-up Icons
@@ -1364,6 +1374,16 @@ class HostWindow(QMainWindow):
 
         menu.exec_(QCursor.pos())
 
+    @pyqtSlot(dict)
+    def slot_addPluginFromBrowser(self, plugin):
+        if not self.host.is_engine_running():
+            QMessageBox.warning(self, self.tr("Warning"), self.tr("Cannot add plugins while the engine is stopped"))
+            return
+        if not self.host.add_plugin(plugin['btype'], plugin['ptype'], plugin['filename'],
+                                    None, plugin['label'], plugin['uniqueId'], None, PLUGIN_OPTIONS_NULL):
+            CustomMessageBox(self, QMessageBox.Critical, self.tr("Error"),
+                             self.tr("Failed to load plugin"), self.host.get_last_error(), self)
+
     @pyqtSlot()
     def slot_pluginAdd(self):
         data = self.showAddPluginDialog()
@@ -1837,6 +1857,11 @@ class HostWindow(QMainWindow):
             pcIcon = patchcanvas.ICON_FILE
 
         patchcanvas.addGroup(clientId, clientName, pcSplit, pcIcon)
+
+        if self.fPendingPluginDropPos is not None:
+            x, y = self.fPendingPluginDropPos
+            self.fPendingPluginDropPos = None
+            patchcanvas.setGroupPos(clientId, x, y)
 
         self.updateMiniCanvasLater()
 
@@ -2830,6 +2855,30 @@ class HostWindow(QMainWindow):
 
     def waitForPendingEvents(self):
         pass
+
+    # --------------------------------------------------------------------------------------------------------
+    # eventFilter — handle plugin browser drag-and-drop onto the patchbay canvas
+
+    def eventFilter(self, obj, event):
+        if obj is self.ui.graphicsView:
+            if event.type() == QEvent.Type.DragEnter:
+                if event.mimeData().hasFormat(MIME_PLUGIN_INFO):
+                    event.acceptProposedAction()
+                    return True
+            elif event.type() == QEvent.Type.DragMove:
+                if event.mimeData().hasFormat(MIME_PLUGIN_INFO):
+                    event.acceptProposedAction()
+                    return True
+            elif event.type() == QEvent.Type.Drop:
+                if event.mimeData().hasFormat(MIME_PLUGIN_INFO):
+                    raw = bytes(event.mimeData().data(MIME_PLUGIN_INFO)).decode('utf-8')
+                    plugin = json.loads(raw)
+                    scenePos = self.ui.graphicsView.mapToScene(event.position().toPoint())
+                    self.fPendingPluginDropPos = (int(scenePos.x()), int(scenePos.y()))
+                    self.slot_addPluginFromBrowser(plugin)
+                    event.acceptProposedAction()
+                    return True
+        return QMainWindow.eventFilter(self, obj, event)
 
     # --------------------------------------------------------------------------------------------------------
     # show/hide event
