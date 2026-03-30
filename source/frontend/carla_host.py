@@ -213,6 +213,8 @@ class HostWindow(QMainWindow):
         self.fCurrentlyRemovingAllPlugins = False
         self.fHasLoadedLv2Plugins = False
 
+        self.fExpandedDirs = set()  # filesystem paths currently expanded in fileTreeView
+
         self.fLastTransportBPM   = 0.0
         self.fLastTransportFrame = 0
         self.fLastTransportState = False
@@ -373,6 +375,7 @@ class HostWindow(QMainWindow):
         self.ui.fileTreeView.setColumnHidden(2, True)
         self.ui.fileTreeView.setColumnHidden(3, True)
         self.ui.fileTreeView.setHeaderHidden(True)
+        self.ui.fileTreeView.setAnimated(False)
 
         # ----------------------------------------------------------------------------------------------------
         # Set up GUI (transport)
@@ -568,7 +571,10 @@ class HostWindow(QMainWindow):
         self.ui.cb_disk.currentIndexChanged.connect(self.slot_diskFolderChanged)
         self.ui.b_disk_add.clicked.connect(self.slot_diskFolderAdd)
         self.ui.b_disk_remove.clicked.connect(self.slot_diskFolderRemove)
+        self.ui.b_disk_collapse.clicked.connect(self.slot_diskCollapseAll)
         self.ui.fileTreeView.doubleClicked.connect(self.slot_fileTreeDoubleClicked)
+        self.ui.fileTreeView.expanded.connect(self.slot_fileTreeExpanded)
+        self.ui.fileTreeView.collapsed.connect(self.slot_fileTreeCollapsed)
 
         self.ui.b_transport_play.clicked.connect(self.slot_transportPlayPause)
         self.ui.b_transport_stop.clicked.connect(self.slot_transportStop)
@@ -1983,6 +1989,7 @@ class HostWindow(QMainWindow):
             diskFolders.append(self.ui.cb_disk.itemData(i))
 
         settings.setValue("DiskFolders", diskFolders)
+        settings.setValue("DiskExpandedDirs", list(self.fExpandedDirs))
         settings.setValue("LastBPM", self.fLastTransportBPM)
 
         settings.setValue("ShowMeters", self.ui.act_settings_show_meters.isChecked())
@@ -2031,6 +2038,10 @@ class HostWindow(QMainWindow):
                 if i == 0: continue
                 folder = diskFolders[i]
                 self.ui.cb_disk.addItem(os.path.basename(folder), folder)
+
+            expandedDirs = settings.value("DiskExpandedDirs", [], list)
+            if expandedDirs:
+                QTimer.singleShot(300, lambda dirs=expandedDirs: self._restoreExpandedDirs(dirs))
 
             #if CARLA_OS_MAC and not settings.value(CARLA_KEY_MAIN_USE_PRO_THEME, True, bool):
             #    self.setUnifiedTitleAndToolBarOnMac(True)
@@ -2282,6 +2293,27 @@ class HostWindow(QMainWindow):
 
         if filename.endswith(".carxp"):
             self.loadExternalCanvasGroupPositionsIfNeeded(filename)
+
+    @pyqtSlot(object)
+    def slot_fileTreeExpanded(self, modelIndex):
+        path = self.fDirModel.filePath(modelIndex)
+        self.fExpandedDirs.add(path)
+
+    @pyqtSlot(object)
+    def slot_fileTreeCollapsed(self, modelIndex):
+        path = self.fDirModel.filePath(modelIndex)
+        self.fExpandedDirs.discard(path)
+
+    @pyqtSlot()
+    def slot_diskCollapseAll(self):
+        self.ui.fileTreeView.collapseAll()
+        self.fExpandedDirs.clear()
+
+    def _restoreExpandedDirs(self, paths):
+        for path in paths:
+            idx = self.fDirModel.index(path)
+            if idx.isValid():
+                self.ui.fileTreeView.expand(idx)
 
     # --------------------------------------------------------------------------------------------------------
     # Transport
