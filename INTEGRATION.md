@@ -124,10 +124,10 @@ These are direct commits on `integrated` that fix regressions introduced by PR m
 
 ## Branch and Integration Status Outline
 
-**Summary**: 0 need attention, 0 awaiting review, 13 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
+**Summary**: 0 need attention, 0 awaiting review, 14 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
 
-Integration built 2026-03-30: merged all 14 open upstream PRs + 13 local feature/bugfix branches; build clean.
-Qt6 frontend active: `qt_config.py` regenerated to `qt = 6`; `make generate-ui` regenerates `ui_*.py` with `pyuic6`; `make check` verifies syntax + UI import; `make test` runs pytest suite (`tests/test_frontend.py` 17 + `tests/test_settings_dialog.py` 15 + `tests/test_executables.py` 7 = 39 tests; offscreen Qt).
+Integration built 2026-03-30: merged all 14 open upstream PRs + 14 local feature/bugfix branches; build clean.
+Qt6 frontend active: `qt_config.py` regenerated to `qt = 6`; `make generate-ui` regenerates `ui_*.py` with `pyuic6`; `make check` verifies syntax + UI import; `make test` runs pytest suite (`tests/test_frontend.py` 17 + `tests/test_settings_dialog.py` 15 + `tests/test_executables.py` 7 + `tests/test_plugin_browser.py` 19 = 58 tests; offscreen Qt).
 Patchbay port signal fix: `PatchbayPortAddedCallback` and `PatchbayPortChangedCallback` emits were missing `value3` (portGroupId); `slot_handlePatchbayPortChangedCallback` was missing the `portGroupId` param. Caused repeated `TypeError` in `carla-jack-multi`/`carla-jack-single` on every JACK port event.
 GitHub Actions IRC notification disabled on fork via `if: false` in `.github/workflows/irc.yml`.
 `SOURCE_MAP.md`: navigational outline of all Carla source subsystems. Run workflow: `.windsurf/workflows/run-carla.md`.
@@ -182,6 +182,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 - [x] **bugfix/2026.03mar.30-svg-text-qt6-crash** — strip `<text>`/`<flowRoot>` from `canvas.svg` + `pb_clementine.svg`; Qt6 SVG renderer segfaults on zero-size or missing-font glyphs — merged 2026-03-30
 - [x] **bugfix/2026.03mar.30-exec-deprecated-qt6** — replace all 12 `exec_()` calls with `exec()` throughout the Python frontend; Qt6 deprecated the underscore form — merged 2026-03-30
 - [x] **feature/2026.03mar.30-start-with-patchbay** — new `Main/StartWithPatchbay` setting + `ch_main_start_patchbay` checkbox; startup tab activates patchbay when set; `projectLoadingFinished` schedules `slot_canvasZoomFit` 300 ms after canvas refresh to centre the viewport on spawned nodes — merged 2026-03-30
+- [x] **feature/2026.03mar.30-plugin-browser-sidebar** — new `w_plugins` tab in the side panel `tabUtils`; `carla_plugin_browser.py` widget enumerates PLUGIN_INTERNAL + PLUGIN_LV2 via `gCarla.utils`; search bar + type filter; double-click emits `pluginActivated(dict)`; drag from list to patchbay view calls `host.add_plugin()` and positions the node via `patchcanvas.setGroupPos` at the drop point — merged 2026-03-30
 
 ### Merged to Upstream
 
@@ -193,7 +194,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 
 - Needs Attention (0 branches): (none)
 - Awaiting Review (0 branches): (none)
-- Local Development (13 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open, lv2-native-scalepoints, svg-text-qt6-crash, exec-deprecated-qt6, start-with-patchbay
+- Local Development (14 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open, lv2-native-scalepoints, svg-text-qt6-crash, exec-deprecated-qt6, start-with-patchbay, plugin-browser-sidebar
 - Secondary Patches (0 branches): (none)
 
 See **Feature Request Branch TODO** section at the end of this file for planned work.
