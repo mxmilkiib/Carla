@@ -2112,7 +2112,7 @@ class HostWindow(QMainWindow):
         self.updateMiniCanvasLater()
 
     @pyqtSlot(int, int, int, int, str)
-    def slot_handlePatchbayPortChangedCallback(self, groupId, portId, portFlags, newPortName):
+    def slot_handlePatchbayPortChangedCallback(self, groupId, portId, portFlags, portGroupId, newPortName):
         patchcanvas.changePortProperties(groupId, portId, newPortName)
         self.updateMiniCanvasLater()
 
@@ -3505,11 +3505,11 @@ def engineCallback(host, action, pluginId, value1, value2, value3, valuef, value
     elif action == ENGINE_CALLBACK_PATCHBAY_CLIENT_POSITION_CHANGED:
         host.PatchbayClientPositionChangedCallback.emit(pluginId, value1, value2, value3, int(round(valuef)))
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_ADDED:
-        host.PatchbayPortAddedCallback.emit(pluginId, value1, value2, valueStr)
+        host.PatchbayPortAddedCallback.emit(pluginId, value1, value2, value3, valueStr)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_REMOVED:
         host.PatchbayPortRemovedCallback.emit(pluginId, value1)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_CHANGED:
-        host.PatchbayPortChangedCallback.emit(pluginId, value1, value2, valueStr)
+        host.PatchbayPortChangedCallback.emit(pluginId, value1, value2, value3, valueStr)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_GROUP_ADDED:
         host.PatchbayPortGroupAddedCallback.emit(pluginId, value1, value2, valueStr)
     elif action == ENGINE_CALLBACK_PATCHBAY_PORT_GROUP_REMOVED:
