@@ -102,6 +102,44 @@ def test_settings_load_save_reset_cover_default_project():
 
 
 # ----------------------------------------------------------------------------
+# SVG icon regression: no <text>/<flowRoot> that crash Qt6 SVG renderer
+# ----------------------------------------------------------------------------
+
+_REPO = os.path.join(FRONTEND, '..', '..')
+# Only the SVGs confirmed to crash Qt6's SVG renderer:
+#  canvas.svg       — font-size:~0.6px;line-height:0% → QFont::setPixelSize(0)
+#  pb_clementine.svg — font-family:Duepuntozero (never installed) → invalid glyph
+# carla.svg / carla-control.svg use font-family:Sans at 16px + line-height:125% and are safe.
+_SCALABLE_SVGs = [
+    'resources/scalable/canvas.svg',
+    'resources/scalable/pb_clementine.svg',
+]
+
+def test_icon_svgs_have_no_text_elements():
+    """Qt6's QSvgText::draw_helper segfaults when font-size resolves to 0 or
+    the referenced font-family is not installed.  Verify the affected icon SVGs
+    contain no <text> or <flowRoot> elements (bugfix/svg-text-qt6-crash)."""
+    import xml.etree.ElementTree as ET
+    CRASH_TAGS = {
+        '{http://www.w3.org/2000/svg}text',
+        '{http://www.w3.org/2000/svg}flowRoot',
+    }
+    offenders = []
+    for relpath in _SCALABLE_SVGs:
+        path = os.path.join(_REPO, relpath)
+        if not os.path.exists(path):
+            continue
+        tree = ET.parse(path)
+        for node in tree.iter():
+            if node.tag in CRASH_TAGS:
+                offenders.append(f'{relpath}: {node.tag}')
+    assert not offenders, (
+        'SVG text elements found — will crash Qt6 SVG renderer:\n' +
+        '\n'.join(offenders)
+    )
+
+
+# ----------------------------------------------------------------------------
 # Feature-branch regression tests (source scanning, no display needed)
 # ----------------------------------------------------------------------------
 
