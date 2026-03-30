@@ -94,11 +94,32 @@ CRITICAL: Feature branches MUST only contain commits belonging to their named fe
   feature/*   ← individual feature/fix branches
 ```
 
+### Branch Base Policy
+
+Every fix or feature commit must be classified at creation time:
+
+| Base | When to use | Can upstream PR? |
+|---|---|---|
+| `upstream/main` | Bug exists in upstream/main; fix cherry-picks cleanly | Yes |
+| `integrated` | Bug was **introduced by a PR merge into integrated**; upstream/main does not have the regression; cherry-pick conflicts | No — stays as a direct commit to integrated |
+
+To test which base to use: `git cherry-pick <fix-commit>` onto a fresh `upstream/main` branch. If it conflicts or the patch is a no-op (upstream already fixed), it is integrated-base.
+
+**integrated-base fixes do not get their own named branch.** They are committed directly to integrated and tracked in the **Integrated-Only Regression Fixes** table below.
+
 ### Branch Dependencies
 
 None currently. If a branch depends on another local branch, it MUST be listed here and noted in the outline entry.
 
 Branches with dependencies on other local branches cannot be submitted upstream as-is. They MUST be refactored to remove the dependency, or the dependency MUST be upstreamed first.
+
+### Integrated-Only Regression Fixes
+
+These are direct commits on `integrated` that fix regressions introduced by PR merges. They cannot be submitted upstream and have no standalone branch. Cherry-picking them to `upstream/main` will conflict or be a no-op.
+
+| Commit | Introduced by | Regression | Files |
+|---|---|---|---|
+| `aa212b5d3` | pr-1397 (port-groups) | `PatchbayPortAddedCallback`/`PatchbayPortChangedCallback` emits passed 4 args to 5-arg signals; `slot_handlePatchbayPortChangedCallback` missing `portGroupId` param → repeated `TypeError` in `carla-jack-*` on every JACK port event | `carla_host.py` |
 
 ## Branch and Integration Status Outline
 
@@ -143,6 +164,7 @@ These are upstream PRs that have been merged into `integrated` for local use. Th
 
 ### Local Only (No PR yet)
 
+All entries here are based on `upstream/main` and are upstream-submittable unless marked `[integrated-base]`.
 These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but no upstream PR has been filed.
 
 - [x] **bugfix/2026.03mar.29-lv2-program-changed-deadlock** — remove re-entrant lock in `handleProgramChanged` (#1968) — merged 2026-03-30
