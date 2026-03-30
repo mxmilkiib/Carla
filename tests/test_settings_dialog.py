@@ -158,6 +158,33 @@ def test_settings_reset_clears_default_project(settings_dialog):
 
 
 # ---------------------------------------------------------------------------
+# Start-with-patchbay setting
+# ---------------------------------------------------------------------------
+
+def test_settings_has_start_patchbay_checkbox(settings_dialog):
+    from PyQt6.QtWidgets import QCheckBox
+    dlg = settings_dialog
+    assert hasattr(dlg.ui, 'ch_main_start_patchbay'), \
+        'settings dialog must have ch_main_start_patchbay checkbox'
+    assert isinstance(dlg.ui.ch_main_start_patchbay, QCheckBox)
+
+
+def test_settings_start_patchbay_default_is_false(settings_dialog):
+    from carla_shared import CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY
+    assert CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY is False
+
+
+def test_settings_reset_clears_start_patchbay(settings_dialog):
+    from carla_settings import CarlaSettingsW
+    dlg = settings_dialog
+    dlg.ui.ch_main_start_patchbay.setChecked(True)
+    dlg.ui.lw_page.selectRow(CarlaSettingsW.TAB_INDEX_MAIN)
+    dlg.slot_resetSettings()
+    assert not dlg.ui.ch_main_start_patchbay.isChecked(), \
+        'slot_resetSettings should reset ch_main_start_patchbay to False'
+
+
+# ---------------------------------------------------------------------------
 # Canvas tab visible
 # ---------------------------------------------------------------------------
 
