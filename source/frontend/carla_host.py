@@ -2118,18 +2118,18 @@ class HostWindow(QMainWindow):
 
     @pyqtSlot(int, int, int, str)
     def slot_handlePatchbayPortGroupAddedCallback(self, groupId, portGroupFlags, portGroupId, newPortName):
-        if portFlags & PATCHBAY_PORT_IS_INPUT:
+        if portGroupFlags & PATCHBAY_PORT_IS_INPUT:
             portMode = patchcanvas.PORT_MODE_INPUT
         else:
             portMode = patchcanvas.PORT_MODE_OUTPUT
 
-        if portFlags & PATCHBAY_PORT_TYPE_AUDIO:
+        if portGroupFlags & PATCHBAY_PORT_TYPE_AUDIO:
             portType    = patchcanvas.PORT_TYPE_AUDIO_JACK
             isAlternate = False
-        elif portFlags & PATCHBAY_PORT_TYPE_CV:
+        elif portGroupFlags & PATCHBAY_PORT_TYPE_CV:
             portType    = patchcanvas.PORT_TYPE_AUDIO_JACK
             isAlternate = True
-        elif portFlags & PATCHBAY_PORT_TYPE_MIDI:
+        elif portGroupFlags & PATCHBAY_PORT_TYPE_MIDI:
             portType    = patchcanvas.PORT_TYPE_MIDI_JACK
             isAlternate = False
         else:
