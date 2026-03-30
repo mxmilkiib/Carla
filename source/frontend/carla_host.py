@@ -2171,8 +2171,9 @@ class HostWindow(QMainWindow):
 
     @pyqtSlot(int, int, int, str)
     def slot_handlePatchbayPortGroupChangedCallback(self, groupId, portId, portGroupId, newPortName):
-        # TODO
-        pass
+        # patchcanvas has no incremental port-group rename/regroup API, so
+        # schedule a full refresh to reflect the change without stale widgets.
+        QTimer.singleShot(1, self.slot_canvasRefresh)
 
     @pyqtSlot(int, int, int, int, int)
     def slot_handlePatchbayConnectionAddedCallback(self, connectionId, groupOutId, portOutId, groupInId, portInId):
