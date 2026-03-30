@@ -3160,7 +3160,8 @@ protected:
         pData->timeInfo.playing = fTimebaseRolling;
         pData->timeInfo.frame = pos->frame;
         pData->timeInfo.usecs = pos->usecs;
-        pData->time.fillJackTimeInfo(pos, nframes);
+        if (nframes > 0)
+            pData->time.fillJackTimeInfo(pos, nframes);
     }
 
     void handleJackClientUnregistrationCallback(const char* const name)
