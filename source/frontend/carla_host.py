@@ -2543,12 +2543,12 @@ class HostWindow(QMainWindow):
         if filename.endswith(".carxp"):
             self.loadExternalCanvasGroupPositionsIfNeeded(filename)
 
-    @pyqtSlot(object)
+    @pyqtSlot(QModelIndex)
     def slot_fileTreeExpanded(self, modelIndex):
         path = self.fDirModel.filePath(modelIndex)
         self.fExpandedDirs.add(path)
 
-    @pyqtSlot(object)
+    @pyqtSlot(QModelIndex)
     def slot_fileTreeCollapsed(self, modelIndex):
         path = self.fDirModel.filePath(modelIndex)
         self.fExpandedDirs.discard(path)
