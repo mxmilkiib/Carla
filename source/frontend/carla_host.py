@@ -676,8 +676,9 @@ class HostWindow(QMainWindow):
         self.ui.tabWidget.setCurrentIndex(0)
         self.ui.tabWidget.blockSignals(False)
 
-        # Start in patchbay tab if using forced patchbay mode
-        if host.processModeForced and host.processMode == ENGINE_PROCESS_MODE_PATCHBAY:
+        # Start in patchbay tab if forced patchbay mode or user preference
+        if (host.processModeForced and host.processMode == ENGINE_PROCESS_MODE_PATCHBAY) or \
+                self.fSavedSettings[CARLA_KEY_MAIN_START_WITH_PATCHBAY]:
             self.ui.tabWidget.setCurrentIndex(1)
 
         # Load initial project file if set
@@ -872,6 +873,7 @@ class HostWindow(QMainWindow):
 
         if refreshCanvas and not self.loadExternalCanvasGroupPositionsIfNeeded(self.fProjectFilename):
             QTimer.singleShot(1, self.slot_canvasRefresh)
+            QTimer.singleShot(300, self.slot_canvasZoomFit)
 
     def loadExternalCanvasGroupPositionsIfNeeded(self, filename):
         extrafile = filename.rsplit(".",1)[0]+".json"
@@ -2065,7 +2067,8 @@ class HostWindow(QMainWindow):
             CARLA_KEY_MAIN_CLASSIC_SKIN:        settings.value(CARLA_KEY_MAIN_CLASSIC_SKIN,        CARLA_DEFAULT_MAIN_CLASSIC_SKIN,        bool),
             CARLA_KEY_MAIN_REFRESH_INTERVAL:    settings.value(CARLA_KEY_MAIN_REFRESH_INTERVAL,    CARLA_DEFAULT_MAIN_REFRESH_INTERVAL,    int),
             CARLA_KEY_MAIN_SYSTEM_ICONS:        settings.value(CARLA_KEY_MAIN_SYSTEM_ICONS,        CARLA_DEFAULT_MAIN_SYSTEM_ICONS,        bool),
-            CARLA_KEY_MAIN_EXPERIMENTAL:        settings.value(CARLA_KEY_MAIN_EXPERIMENTAL,        CARLA_DEFAULT_MAIN_EXPERIMENTAL,        bool),
+            CARLA_KEY_MAIN_EXPERIMENTAL:            settings.value(CARLA_KEY_MAIN_EXPERIMENTAL,            CARLA_DEFAULT_MAIN_EXPERIMENTAL,            bool),
+            CARLA_KEY_MAIN_START_WITH_PATCHBAY:    settings.value(CARLA_KEY_MAIN_START_WITH_PATCHBAY,    CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY,    bool),
             CARLA_KEY_CANVAS_THEME:             settings.value(CARLA_KEY_CANVAS_THEME,             CARLA_DEFAULT_CANVAS_THEME,             str),
             CARLA_KEY_CANVAS_SIZE:              settings.value(CARLA_KEY_CANVAS_SIZE,              CARLA_DEFAULT_CANVAS_SIZE,              str),
             CARLA_KEY_CANVAS_AUTO_HIDE_GROUPS:  settings.value(CARLA_KEY_CANVAS_AUTO_HIDE_GROUPS,  CARLA_DEFAULT_CANVAS_AUTO_HIDE_GROUPS,  bool),

@@ -189,7 +189,8 @@ CARLA_KEY_MAIN_CONFIRM_EXIT     = "Main/ConfirmExit"     # bool
 CARLA_KEY_MAIN_CLASSIC_SKIN     = "Main/ClassicSkin"     # bool
 CARLA_KEY_MAIN_SHOW_LOGS        = "Main/ShowLogs"        # bool
 CARLA_KEY_MAIN_SYSTEM_ICONS     = "Main/SystemIcons"     # bool
-CARLA_KEY_MAIN_EXPERIMENTAL     = "Main/Experimental"    # bool
+CARLA_KEY_MAIN_EXPERIMENTAL        = "Main/Experimental"       # bool
+CARLA_KEY_MAIN_START_WITH_PATCHBAY = "Main/StartWithPatchbay"  # bool
 
 CARLA_KEY_CANVAS_THEME             = "Canvas/Theme"           # str
 CARLA_KEY_CANVAS_SIZE              = "Canvas/Size"            # str "NxN"
@@ -272,7 +273,8 @@ CARLA_DEFAULT_MAIN_CONFIRM_EXIT     = True
 CARLA_DEFAULT_MAIN_CLASSIC_SKIN     = False
 CARLA_DEFAULT_MAIN_SHOW_LOGS        = bool(not CARLA_OS_WIN)
 CARLA_DEFAULT_MAIN_SYSTEM_ICONS     = False
-CARLA_DEFAULT_MAIN_EXPERIMENTAL     = False
+CARLA_DEFAULT_MAIN_EXPERIMENTAL        = False
+CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY = False
 
 # Canvas
 CARLA_DEFAULT_CANVAS_THEME             = "Modern Dark"

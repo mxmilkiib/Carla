@@ -54,6 +54,7 @@ from carla_shared import (
     CARLA_KEY_MAIN_SHOW_LOGS,
     CARLA_KEY_MAIN_SYSTEM_ICONS,
     CARLA_KEY_MAIN_EXPERIMENTAL,
+    CARLA_KEY_MAIN_START_WITH_PATCHBAY,
     CARLA_KEY_CANVAS_THEME,
     CARLA_KEY_CANVAS_SIZE,
     CARLA_KEY_CANVAS_USE_BEZIER_LINES,
@@ -114,6 +115,7 @@ from carla_shared import (
     CARLA_DEFAULT_MAIN_CONFIRM_EXIT,
     CARLA_DEFAULT_MAIN_CLASSIC_SKIN,
     CARLA_DEFAULT_MAIN_SHOW_LOGS,
+    CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY,
     CARLA_DEFAULT_MAIN_SYSTEM_ICONS,
     #CARLA_DEFAULT_MAIN_EXPERIMENTAL,
     CARLA_DEFAULT_CANVAS_THEME,
@@ -692,6 +694,8 @@ class CarlaSettingsW(QDialog):
         # Main
 
         self.ui.ch_main_show_logs.setChecked(self.host.showLogs)
+        self.ui.ch_main_start_patchbay.setChecked(
+            settings.value(CARLA_KEY_MAIN_START_WITH_PATCHBAY, CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY, bool))
         self.ui.ch_engine_uis_always_on_top.setChecked(self.host.uisAlwaysOnTop)
 
         self.ui.le_main_proj_folder.setText(
@@ -1023,7 +1027,8 @@ class CarlaSettingsW(QDialog):
         # -------------------------------------------------------------------------------------------------------------
         # Main
 
-        settings.setValue(CARLA_KEY_MAIN_EXPERIMENTAL, self.host.experimental)
+        settings.setValue(CARLA_KEY_MAIN_EXPERIMENTAL,         self.host.experimental)
+        settings.setValue(CARLA_KEY_MAIN_START_WITH_PATCHBAY,  self.ui.ch_main_start_patchbay.isChecked())
 
         # -------------------------------------------------------------------------------------------------------------
         # Engine
@@ -1197,6 +1202,7 @@ class CarlaSettingsW(QDialog):
             self.ui.ch_main_confirm_exit.setChecked(CARLA_DEFAULT_MAIN_CONFIRM_EXIT)
             self.ui.cb_main_classic_skin_default(CARLA_DEFAULT_MAIN_CLASSIC_SKIN)
             self.ui.ch_main_show_logs.setChecked(CARLA_DEFAULT_MAIN_SHOW_LOGS)
+            self.ui.ch_main_start_patchbay.setChecked(CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY)
 
         # -------------------------------------------------------------------------------------------------------------
         # Canvas
