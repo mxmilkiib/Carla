@@ -57,6 +57,7 @@ from carla_shared import (
     CARLA_KEY_MAIN_SHOW_LOGS,
     CARLA_KEY_MAIN_SYSTEM_ICONS,
     CARLA_KEY_MAIN_EXPERIMENTAL,
+    CARLA_KEY_MAIN_START_WITH_PATCHBAY,
     CARLA_KEY_CANVAS_THEME,
     CARLA_KEY_CANVAS_SIZE,
     CARLA_KEY_CANVAS_USE_BEZIER_LINES,
@@ -122,6 +123,7 @@ from carla_shared import (
     CARLA_DEFAULT_MAIN_SYSTEM_ICONS,
     CARLA_DEFAULT_MAIN_SKIN_TWEAKS,
     #CARLA_DEFAULT_MAIN_EXPERIMENTAL,
+    CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY,
     CARLA_DEFAULT_CANVAS_THEME,
     CARLA_DEFAULT_CANVAS_SIZE,
     CARLA_DEFAULT_CANVAS_USE_BEZIER_LINES,
@@ -699,6 +701,8 @@ class CarlaSettingsW(QDialog):
         # Main
 
         self.ui.ch_main_show_logs.setChecked(self.host.showLogs)
+        self.ui.ch_main_start_patchbay.setChecked(
+            settings.value(CARLA_KEY_MAIN_START_WITH_PATCHBAY, CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY, bool))
         self.ui.ch_engine_uis_always_on_top.setChecked(self.host.uisAlwaysOnTop)
 
         self.ui.le_main_proj_folder.setText(
@@ -1016,7 +1020,8 @@ class CarlaSettingsW(QDialog):
         settings.setValue(CARLA_KEY_MAIN_PRO_THEME_COLOR,  self.ui.cb_main_theme_color.currentText())
         settings.setValue(CARLA_KEY_MAIN_REFRESH_INTERVAL,     self.ui.sb_main_refresh_interval.value())
         settings.setValue(CARLA_KEY_MAIN_DSP_REFRESH_INTERVAL, self.ui.sb_main_dsp_refresh_interval.value())
-        settings.setValue(CARLA_KEY_MAIN_SYSTEM_ICONS,     self.ui.ch_main_system_icons.isChecked())
+        settings.setValue(CARLA_KEY_MAIN_SYSTEM_ICONS,         self.ui.ch_main_system_icons.isChecked())
+        settings.setValue(CARLA_KEY_MAIN_START_WITH_PATCHBAY,  self.ui.ch_main_start_patchbay.isChecked())
 
         # -------------------------------------------------------------------------------------------------------------
         # Canvas
@@ -1219,6 +1224,7 @@ class CarlaSettingsW(QDialog):
             self.ui.ch_main_confirm_exit.setChecked(CARLA_DEFAULT_MAIN_CONFIRM_EXIT)
             self.ui.cb_main_classic_skin_default.setChecked(CARLA_DEFAULT_MAIN_CLASSIC_SKIN)
             self.ui.ch_main_show_logs.setChecked(CARLA_DEFAULT_MAIN_SHOW_LOGS)
+            self.ui.ch_main_start_patchbay.setChecked(CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY)
 
         # -------------------------------------------------------------------------------------------------------------
         # Canvas
@@ -1498,7 +1504,7 @@ class CarlaSettingsW(QDialog):
     def slot_showAudioDriverSettings(self):
         driverIndex = self.ui.cb_engine_audio_driver.currentIndex()
         driverName  = self.ui.cb_engine_audio_driver.currentText()
-        DriverSettingsW(self, self.host, driverIndex, driverName).exec_()
+        DriverSettingsW(self, self.host, driverIndex, driverName).exec()
 
     # -----------------------------------------------------------------------------------------------------------------
 

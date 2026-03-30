@@ -195,7 +195,8 @@ CARLA_KEY_MAIN_CONFIRM_EXIT     = "Main/ConfirmExit"     # bool
 CARLA_KEY_MAIN_CLASSIC_SKIN     = "Main/ClassicSkin"     # bool
 CARLA_KEY_MAIN_SHOW_LOGS        = "Main/ShowLogs"        # bool
 CARLA_KEY_MAIN_SYSTEM_ICONS     = "Main/SystemIcons"     # bool
-CARLA_KEY_MAIN_EXPERIMENTAL     = "Main/Experimental"    # bool
+CARLA_KEY_MAIN_EXPERIMENTAL        = "Main/Experimental"       # bool
+CARLA_KEY_MAIN_START_WITH_PATCHBAY = "Main/StartWithPatchbay"  # bool
 
 CARLA_KEY_CANVAS_THEME             = "Canvas/Theme"           # str
 CARLA_KEY_CANVAS_SIZE              = "Canvas/Size"            # str "NxN"
@@ -280,7 +281,8 @@ CARLA_DEFAULT_MAIN_CONFIRM_EXIT     = True
 CARLA_DEFAULT_MAIN_CLASSIC_SKIN     = False
 CARLA_DEFAULT_MAIN_SHOW_LOGS        = bool(not CARLA_OS_WIN)
 CARLA_DEFAULT_MAIN_SYSTEM_ICONS     = False
-CARLA_DEFAULT_MAIN_EXPERIMENTAL     = False
+CARLA_DEFAULT_MAIN_EXPERIMENTAL        = False
+CARLA_DEFAULT_MAIN_START_WITH_PATCHBAY = False
 CARLA_DEFAULT_MAIN_SKIN_TWEAKS      = "'ShowPan':0, 'ShowForth':0, 'WetVolPush':0, 'WetVolPushLed':1, 'Tooltips':0, 'MoreSpace':0, 'WetVolOnCompact':0, 'SymmetricArc':1, 'GapAuto':0, 'ColorFollow':0, 'ShortenLabels':1, 'ButtonHaveLed':1, 'ColoredNeon':1, 'HighContrast':0, 'ShowDisabled':0, 'ShowOutputs':1, 'ShowButtons':1, 'Button3Pos':1, 'TwoLineLabels':0, 'GapMin':0, 'GapMax':100, 'ColorFrom':-0.1, 'ColorSpan':0.4, 'Auto7segSize':0, 'Auto7segWidth':1, 'ShowReload':0, 'ShowPrograms':0, 'ShowMidiPrograms':0, 'ShowProgramsOnCompact':0, 'ShowMidiProgramsOnCompact':0, "
 
 # Canvas
@@ -936,7 +938,7 @@ def CustomMessageBox(parent, icon, title, text,
     msgBox.setStandardButtons(buttons)
     msgBox.setDefaultButton(defButton)
     # pylint: disable=no-value-for-parameter
-    return msgBox.exec_()
+    return msgBox.exec()
     # pylint: enable=no-value-for-parameter
 # pylint: enable=too-many-arguments
 

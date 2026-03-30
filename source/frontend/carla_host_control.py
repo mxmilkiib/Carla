@@ -684,7 +684,7 @@ class HostWindowOSC(HostWindow):
     def slot_fileConnect(self):
         dialog = ConnectDialog(self)
 
-        if not dialog.exec_():
+        if not dialog.exec():
             return
 
         host, tcpPort, udpPort = dialog.getResult()

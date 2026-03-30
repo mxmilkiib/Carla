@@ -2297,4 +2297,4 @@ if __name__ == '__main__':
     gui.testTimer()
     gui.show()
 
-    app.exec_()
+    app.exec()

@@ -233,7 +233,7 @@ class CommonDial(QWidget):
             stepSmall = step / 100
 
         dialog = CustomInputDialog(self, self.fLabel, self.fRealValue * percent, self.fMinimum * percent, self.fMaximum * percent, step, stepSmall, self.fScalePoints, "", "", self.fUnit)
-        if not dialog.exec_():
+        if not dialog.exec():
             return
 
         self.setValue(dialog.returnValue() / percent, True)

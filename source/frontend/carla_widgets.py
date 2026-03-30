@@ -1541,7 +1541,7 @@ class PluginEdit(QDialog):
 
             dialog = CustomInputDialog(self, label, current * percent, minimum * percent, maximum * percent, step, stepSmall, scalePoints, "", "", unit)
 
-            if not dialog.exec_():
+            if not dialog.exec():
                 return
 
             value = dialog.returnValue() / percent

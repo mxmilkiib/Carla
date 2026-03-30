@@ -574,7 +574,7 @@ class ParamSpinBox(QAbstractSpinBox):
             dialog = CustomInputDialog(self, self.fName, self.fValue, self.fMinimum, self.fMaximum,
                                              self.fStep, self.fStepSmall, self.fScalePoints,
                                              self.fLabelPrefix, self.fLabelSuffix)
-            if dialog.exec_():
+            if dialog.exec():
                 value = dialog.returnValue()
                 self.setValue(value)
 

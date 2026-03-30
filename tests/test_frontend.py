@@ -215,3 +215,51 @@ def test_widget_modules_importable():
 
 def test_utils_module_importable():
     _load('utils/qsafesettings.py')
+
+
+# ----------------------------------------------------------------------------
+# exec_() deprecation regression: Qt6 deprecated exec_() in favour of exec()
+# ----------------------------------------------------------------------------
+
+_EXEC_DEPRECATED_FILES = [
+    'carla_app.py',
+    'carla_host.py',
+    'carla_host_control.py',
+    'carla_settings.py',
+    'carla_shared.py',
+    'carla_skin.py',
+    'carla_widgets.py',
+    'widgets/commondial.py',
+    'widgets/paramspinbox.py',
+]
+
+def test_no_exec_deprecated():
+    """No frontend Python file should call .exec_() — Qt6 deprecated it.
+    All dialog/app exec calls must use .exec() instead."""
+    offenders = []
+    for relpath in _EXEC_DEPRECATED_FILES:
+        src = _src(relpath)
+        for i, line in enumerate(src.splitlines(), 1):
+            if '.exec_()' in line and not line.lstrip().startswith('#'):
+                offenders.append(f'{relpath}:{i}: {line.strip()}')
+    assert not offenders, 'Found deprecated .exec_() calls:\n' + '\n'.join(offenders)
+
+
+# ----------------------------------------------------------------------------
+# Start-with-patchbay feature regression
+# ----------------------------------------------------------------------------
+
+def test_start_with_patchbay_key_in_saved_settings():
+    """carla_host.py loadSettings must include CARLA_KEY_MAIN_START_WITH_PATCHBAY
+    in fSavedSettings so the startup tab logic can read it."""
+    src = _src('carla_host.py')
+    assert 'CARLA_KEY_MAIN_START_WITH_PATCHBAY' in src, \
+        'carla_host.py missing CARLA_KEY_MAIN_START_WITH_PATCHBAY in fSavedSettings'
+
+
+def test_zoom_fit_after_project_load():
+    """projectLoadingFinished must schedule a slot_canvasZoomFit call so the
+    viewport centres on spawned nodes after a project loads."""
+    src = _src('carla_host.py')
+    assert 'slot_canvasZoomFit' in src, \
+        'carla_host.py missing slot_canvasZoomFit call in projectLoadingFinished'
