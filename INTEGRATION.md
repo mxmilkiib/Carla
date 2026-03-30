@@ -120,6 +120,7 @@ These are direct commits on `integrated` that fix regressions introduced by PR m
 | Commit | Introduced by | Regression | Files |
 |---|---|---|---|
 | `aa212b5d3` | pr-1397 (port-groups) | `PatchbayPortAddedCallback`/`PatchbayPortChangedCallback` emits passed 4 args to 5-arg signals; `slot_handlePatchbayPortChangedCallback` missing `portGroupId` param → repeated `TypeError` in `carla-jack-*` on every JACK port event | `carla_host.py` |
+| `09a5e7a82` | pr-1397 (port-groups) | `slot_handlePatchbayPortGroupAddedCallback` body referenced `portFlags` after pr-1397 renamed the param to `portGroupFlags` → `NameError` on every port-group add event | `carla_host.py` |
 
 ## Branch and Integration Status Outline
 
