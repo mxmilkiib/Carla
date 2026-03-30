@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   notification:
+    if: false
     runs-on: ubuntu-latest
     name: IRC notification
     steps:
