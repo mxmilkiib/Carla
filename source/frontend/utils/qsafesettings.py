@@ -21,7 +21,12 @@ class QSafeSettings(QSettings):
             print("QSafeSettings.value() - defaultValue type mismatch for key", key)
 
         try:
-            return QSettings.value(self, key, defaultValue, valueType)
+            v = QSettings.value(self, key, defaultValue, valueType)
+            # PyQt6 occasionally returns a raw string for bool keys (stored as
+            # "true"/"false" in INI format) when type coercion silently fails.
+            if valueType is bool and isinstance(v, str):
+                return v.lower() not in ('false', '0', '')
+            return v
         except:
             return defaultValue
 
