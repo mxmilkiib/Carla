@@ -1467,7 +1467,7 @@ class CarlaSettingsW(QDialog):
     def slot_showAudioDriverSettings(self):
         driverIndex = self.ui.cb_engine_audio_driver.currentIndex()
         driverName  = self.ui.cb_engine_audio_driver.currentText()
-        DriverSettingsW(self, self.host, driverIndex, driverName).exec_()
+        DriverSettingsW(self, self.host, driverIndex, driverName).exec()
 
     # -----------------------------------------------------------------------------------------------------------------
 

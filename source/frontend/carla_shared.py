@@ -923,7 +923,7 @@ def CustomMessageBox(parent, icon, title, text,
     msgBox.setStandardButtons(buttons)
     msgBox.setDefaultButton(defButton)
     # pylint: disable=no-value-for-parameter
-    return msgBox.exec_()
+    return msgBox.exec()
     # pylint: enable=no-value-for-parameter
 # pylint: enable=too-many-arguments
 

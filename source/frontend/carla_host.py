@@ -1044,7 +1044,7 @@ class HostWindow(QMainWindow):
             dialog.ui.label_restart.hide()
             dialog.adjustSize()
 
-        if not dialog.exec_():
+        if not dialog.exec():
             return
 
         audioDevice, bufferSize, sampleRate = dialog.getValues()
@@ -1749,7 +1749,7 @@ class HostWindow(QMainWindow):
         fileDialog.setOptions(QFileDialog.DontUseCustomDirectoryIcons)
         fileDialog.setWindowTitle(self.tr("Save Image"))
 
-        ok = fileDialog.exec_()
+        ok = fileDialog.exec()
 
         if not ok:
             return
@@ -2198,7 +2198,7 @@ class HostWindow(QMainWindow):
     @pyqtSlot()
     def slot_configureCarla(self):
         dialog = CarlaSettingsW(self.fParentOrSelf, self.host, True, hasGL)
-        if not dialog.exec_():
+        if not dialog.exec():
             return
 
         self.loadSettings(False)

@@ -1361,7 +1361,7 @@ class AbstractPluginSlot(QFrame, PluginEditParentMeta):
                 dialog = CustomInputDialog(self, label, current, minimum, maximum,
                                                  paramRanges['step'], paramRanges['stepSmall'], scalePoints, prefix, suffix)
 
-                if not dialog.exec_():
+                if not dialog.exec():
                     return
 
                 value = dialog.returnValue()
@@ -2106,4 +2106,4 @@ if __name__ == '__main__':
     gui.testTimer()
     gui.show()
 
-    app.exec_()
+    app.exec()

@@ -305,10 +305,10 @@ class CarlaApplication():
         self.fApp.setPalette(self.fPalBlue)
 
     def exec_(self):
-        return self.fApp.exec_()
+        return self.fApp.exec()
 
     def exit_exec(self):
-        return sys.exit(self.fApp.exec_())
+        return sys.exit(self.fApp.exec())
 
     def getApp(self):
         return self.fApp
