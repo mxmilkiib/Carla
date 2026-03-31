@@ -521,6 +521,7 @@ class HostWindow(QMainWindow):
             self.fPluginBrowser = PluginBrowserWidget(self.ui.w_plugins)
             self.ui.verticalLayout_plugins.addWidget(self.fPluginBrowser)
             self.fPluginBrowser.pluginActivated.connect(self.slot_addPluginFromBrowser)
+            self.ui.tabUtils.currentChanged.connect(self.slot_tabUtilsChanged)
             self.ui.graphicsView.setAcceptDrops(True)
             self.ui.graphicsView.installEventFilter(self)
 
@@ -1290,6 +1291,9 @@ class HostWindow(QMainWindow):
 
         if self.fWithCanvas:
             QTimer.singleShot(1000, self.slot_canvasZoomFit)
+
+        if self.fPluginBrowser is not None:
+            QTimer.singleShot(500, self.fPluginBrowser.refresh)
 
     @pyqtSlot()
     def slot_handleEngineStoppedCallback(self):
@@ -2566,6 +2570,12 @@ class HostWindow(QMainWindow):
             idx = self.fDirModel.index(path)
             if idx.isValid():
                 self.ui.fileTreeView.expand(idx)
+
+    @pyqtSlot(int)
+    def slot_tabUtilsChanged(self, index):
+        if self.fPluginBrowser is not None and not self.fPluginBrowser._loaded:
+            if self.ui.tabUtils.widget(index) is self.ui.w_plugins:
+                self.fPluginBrowser.refresh()
 
     # --------------------------------------------------------------------------------------------------------
     # Transport

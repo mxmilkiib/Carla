@@ -124,7 +124,7 @@ class PluginBrowserWidget(QWidget):
         layout.addWidget(self._list, stretch=1)
 
         hbox = QHBoxLayout()
-        self._status = QLabel("Click Refresh to load plugins")
+        self._status = QLabel("Waiting for engine...")
         self._status.setStyleSheet("color: gray; font-size: 10px;")
         self._refreshBtn = QPushButton("Refresh")
         self._refreshBtn.setMaximumWidth(70)
