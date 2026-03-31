@@ -8,9 +8,9 @@
 from qt_compat import qt_config
 
 if qt_config == 5:
-    from PyQt5.QtCore import qCritical, QPointF, QTimer
+    from PyQt5.QtCore import qCritical, QPointF, QRectF, QTimer
 elif qt_config == 6:
-    from PyQt6.QtCore import qCritical, QPointF, QTimer
+    from PyQt6.QtCore import qCritical, QPointF, QRectF, QTimer
 
 # ------------------------------------------------------------------------------------------------------------
 # Imports (Custom)
@@ -20,6 +20,12 @@ from .canvasfadeanimation import CanvasFadeAnimation
 
 # ------------------------------------------------------------------------------------------------------------
 
+# Minimum footprint reserved around a new node's spawn point (scene units).
+# Using a conservative 160 x 30 rect catches even narrow nodes without being
+# so large that it creates unnecessary gaps between unrelated groups.
+_SPAWN_GUARD_W = 160
+_SPAWN_GUARD_H = 30
+
 def CanvasGetNewGroupPos(horizontal):
     if canvas.debug:
         print("PatchCanvas::CanvasGetNewGroupPos(%s)" % bool2str(horizontal))
@@ -27,12 +33,13 @@ def CanvasGetNewGroupPos(horizontal):
     new_pos = QPointF(canvas.initial_pos)
     items = canvas.scene.items()
 
-    #break_loop = False
     while True:
         break_for = False
-        for i, item in enumerate(items):
+        for item in items:
             if item and item.type() == CanvasBoxType:
-                if item.sceneBoundingRect().adjusted(-5, -5, 5, 5).contains(new_pos):
+                existing = item.sceneBoundingRect().adjusted(-10, -5, 10, 5)
+                spawn = QRectF(new_pos.x(), new_pos.y(), _SPAWN_GUARD_W, _SPAWN_GUARD_H)
+                if existing.intersects(spawn) or existing.contains(new_pos):
                     itemRect = item.boundingRect()
                     if horizontal:
                         new_pos += QPointF(itemRect.width() + 50, 0)
@@ -44,10 +51,8 @@ def CanvasGetNewGroupPos(horizontal):
                             new_pos.setY(item.scenePos().y() + itemHeight + 20)
                     break_for = True
                     break
-        else:
-            if not break_for:
-                break
-            #break_loop = True
+        if not break_for:
+            break
 
     return new_pos
 

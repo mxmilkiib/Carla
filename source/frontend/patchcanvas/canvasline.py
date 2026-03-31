@@ -145,6 +145,8 @@ class CanvasLine(QGraphicsLineItem):
             port_gradient.setColorAt(pos1, canvas.theme.line_midi_alsa_sel if self.m_lineSelected else canvas.theme.line_midi_alsa)
         elif port_type1 == PORT_TYPE_PARAMETER:
             port_gradient.setColorAt(pos1, canvas.theme.line_parameter_sel if self.m_lineSelected else canvas.theme.line_parameter)
+        else:
+            port_gradient.setColorAt(pos1, canvas.theme.line_null_sel if self.m_lineSelected else canvas.theme.line_null)
 
         if port_type2 == PORT_TYPE_AUDIO_JACK:
             port_gradient.setColorAt(pos2, canvas.theme.line_audio_jack_sel if self.m_lineSelected else canvas.theme.line_audio_jack)
@@ -154,6 +156,8 @@ class CanvasLine(QGraphicsLineItem):
             port_gradient.setColorAt(pos2, canvas.theme.line_midi_alsa_sel if self.m_lineSelected else canvas.theme.line_midi_alsa)
         elif port_type2 == PORT_TYPE_PARAMETER:
             port_gradient.setColorAt(pos2, canvas.theme.line_parameter_sel if self.m_lineSelected else canvas.theme.line_parameter)
+        else:
+            port_gradient.setColorAt(pos2, canvas.theme.line_null_sel if self.m_lineSelected else canvas.theme.line_null)
 
         self.setPen(QPen(port_gradient, 2.00001, Qt.SolidLine, Qt.RoundCap))
 

@@ -122,6 +122,8 @@ class Theme(object):
             self.line_parameter = QColor(137, 76, 43)
             self.line_parameter_sel = QColor(137 + 90, 76 + 90, 43 + 90)
             self.line_parameter_glow = QColor(166, 133, 133)
+            self.line_null = QColor(200, 180, 0)
+            self.line_null_sel = QColor(255, 230, 50)
 
             self.rubberband_pen = QPen(QColor(206, 207, 208), 1, Qt.SolidLine)
             self.rubberband_brush = QColor(76, 77, 78, 100)
@@ -210,6 +212,8 @@ class Theme(object):
             self.line_parameter = QColor(137, 76, 43)
             self.line_parameter_sel = QColor(137 + 90, 76 + 90, 43 + 90)
             self.line_parameter_glow = QColor(166, 133, 133)
+            self.line_null = QColor(200, 180, 0)
+            self.line_null_sel = QColor(255, 230, 50)
 
             self.rubberband_pen = QPen(QColor(206, 207, 208), 1, Qt.SolidLine)
             self.rubberband_brush = QColor(76, 77, 78, 100)
@@ -298,6 +302,8 @@ class Theme(object):
             self.line_parameter = QColor(137, 43, 43)
             self.line_parameter_sel = QColor(137 + 90, 76 + 90, 43 + 90)
             self.line_parameter_glow = QColor(166, 133, 133)
+            self.line_null = QColor(200, 180, 0)
+            self.line_null_sel = QColor(255, 230, 50)
 
             self.rubberband_pen = QPen(QColor(206, 207, 208), 1, Qt.SolidLine)
             self.rubberband_brush = QColor(76, 77, 78, 100)
@@ -386,6 +392,8 @@ class Theme(object):
             self.line_parameter = QColor(120, 65, 33)
             self.line_parameter_sel = QColor(255, 0, 0)
             self.line_parameter_glow = QColor(255, 0, 0)
+            self.line_null = QColor(200, 180, 0)
+            self.line_null_sel = QColor(255, 230, 50)
 
             self.rubberband_pen = QPen(QColor(147, 151, 143), 2, Qt.SolidLine)
             self.rubberband_brush = QColor(35, 61, 99, 100)
@@ -478,6 +486,8 @@ class Theme(object):
             self.line_parameter = QColor(64, 64, 64)
             self.line_parameter_sel = QColor(137+90, 76+90, 43+90)
             self.line_parameter_glow = QColor(166, 133, 133)
+            self.line_null = QColor(200, 180, 0)
+            self.line_null_sel = QColor(255, 230, 50)
 
             self.rubberband_pen = QPen(QColor(1, 230, 238), 2, Qt.SolidLine)
             self.rubberband_brush = QColor(90, 90, 90, 100)

@@ -135,6 +135,11 @@ CARLA_CLIENT_NAME = os.getenv("CARLA_CLIENT_NAME")
 LADISH_APP_NAME   = os.getenv("LADISH_APP_NAME")
 NSM_URL           = os.getenv("NSM_URL")
 
+# Client name substrings (case-insensitive) whose patchbay nodes are placed
+# below all other nodes on creation — they generate many connections and
+# clutter the canvas centre when mixed with audio/MIDI apps.
+_BELOW_ALL_CLIENTS = ('plasmashell', 'pavucontrol')
+
 # ------------------------------------------------------------------------------------------------------------
 # Small print helper
 
@@ -1866,6 +1871,17 @@ class HostWindow(QMainWindow):
         y = self.ui.graphicsView.verticalScrollBar().value() + self.height()/4
         patchcanvas.setInitialPos(x, y)
 
+    def _canvas_max_node_bottom(self):
+        max_bottom = None
+        for group in patchcanvas.canvas.group_list:
+            for widget in group.widgets:
+                if widget is None:
+                    continue
+                bottom = widget.scenePos().y() + widget.boundingRect().height()
+                if max_bottom is None or bottom > max_bottom:
+                    max_bottom = bottom
+        return max_bottom if max_bottom is not None else patchcanvas.canvas.initial_pos.y()
+
     def updateMiniCanvasLater(self):
         QTimer.singleShot(self.fMiniCanvasUpdateTimeout, self.ui.miniCanvasPreview.update)
 
@@ -2050,12 +2066,18 @@ class HostWindow(QMainWindow):
         elif clientIcon == PATCHBAY_ICON_FILE:
             pcIcon = patchcanvas.ICON_FILE
 
+        below_y = None
+        if self.fWithCanvas and any(pat in clientName.lower() for pat in _BELOW_ALL_CLIENTS):
+            below_y = self._canvas_max_node_bottom() + 40
+
         patchcanvas.addGroup(clientId, clientName, pcSplit, pcIcon)
 
         if self.fPendingPluginDropPos is not None:
             x, y = self.fPendingPluginDropPos
             self.fPendingPluginDropPos = None
             patchcanvas.setGroupPos(clientId, x, y)
+        elif below_y is not None:
+            patchcanvas.setGroupPos(clientId, patchcanvas.canvas.initial_pos.x(), below_y)
 
         self.updateMiniCanvasLater()
 
