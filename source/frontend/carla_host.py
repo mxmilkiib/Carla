@@ -517,13 +517,15 @@ class HostWindow(QMainWindow):
 
             self.setupCanvas()
 
-            # Plugin browser sidebar
-            self.fPluginBrowser = PluginBrowserWidget(self.ui.w_plugins)
-            self.ui.verticalLayout_plugins.addWidget(self.fPluginBrowser)
-            self.fPluginBrowser.pluginActivated.connect(self.slot_addPluginFromBrowser)
-            self.ui.tabUtils.currentChanged.connect(self.slot_tabUtilsChanged)
             self.ui.graphicsView.setAcceptDrops(True)
             self.ui.graphicsView.installEventFilter(self)
+
+        # Plugin browser sidebar — always created so the Plugins tab is
+        # populated in all host modes (rack, patchbay, etc.)
+        self.fPluginBrowser = PluginBrowserWidget(self.ui.w_plugins)
+        self.ui.verticalLayout_plugins.addWidget(self.fPluginBrowser)
+        self.fPluginBrowser.pluginActivated.connect(self.slot_addPluginFromBrowser)
+        self.ui.tabUtils.currentChanged.connect(self.slot_tabUtilsChanged)
 
         # ----------------------------------------------------------------------------------------------------
         # Set-up Icons
