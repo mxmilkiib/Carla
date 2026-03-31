@@ -1153,6 +1153,9 @@ class HostWindow(QMainWindow):
         self.ui.text_logs.appendPlainText("  Sample rate:  %i" % int(sampleRate))
         self.ui.text_logs.appendPlainText("  Process mode: %s" % processMode2Str(processMode))
 
+        if self.fWithCanvas:
+            QTimer.singleShot(1000, self.slot_canvasZoomFit)
+
     @pyqtSlot()
     def slot_handleEngineStoppedCallback(self):
         self.ui.text_logs.appendPlainText("======= Engine stopped ========")
