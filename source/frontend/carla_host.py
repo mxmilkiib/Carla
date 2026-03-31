@@ -142,7 +142,7 @@ NSM_URL           = os.getenv("NSM_URL")
 # Client name substrings (case-insensitive) whose patchbay nodes are placed
 # below all other nodes on creation — they generate many connections and
 # clutter the canvas centre when mixed with audio/MIDI apps.
-_BELOW_ALL_CLIENTS = ('plasmashell', 'pavucontrol')
+_BELOW_ALL_CLIENTS = ('plasmashell', 'pavucontrol', 'midi-bridge', 'a2j', 'a2jmidid', 'ble midi', 'bluetooth midi')
 
 # ------------------------------------------------------------------------------------------------------------
 # Small print helper
@@ -657,6 +657,7 @@ class HostWindow(QMainWindow):
             self.ui.act_canvas_zoom_out.triggered.connect(self.slot_canvasZoomOut)
             self.ui.act_canvas_zoom_100.triggered.connect(self.slot_canvasZoomReset)
             self.ui.act_canvas_save_image.triggered.connect(self.slot_canvasSaveImage)
+            self.ui.act_canvas_save_image.setShortcut(QKeySequence("Ctrl+Shift+I"))
             self.ui.act_canvas_save_image_2x.triggered.connect(self.slot_canvasSaveImage)
             self.ui.act_canvas_save_image_4x.triggered.connect(self.slot_canvasSaveImage)
             self.ui.act_canvas_copy_clipboard.triggered.connect(self.slot_canvasCopyToClipboard)
@@ -1920,6 +1921,21 @@ class HostWindow(QMainWindow):
                     max_bottom = bottom
         return max_bottom if max_bottom is not None else patchcanvas.canvas.initial_pos.y()
 
+    def _canvas_hardware_zone_bottom(self):
+        hw_bottom = None
+        for group in patchcanvas.canvas.group_list:
+            if group.icon != patchcanvas.ICON_HARDWARE:
+                continue
+            for widget in group.widgets:
+                if widget is None:
+                    continue
+                b = widget.scenePos().y() + widget.boundingRect().height()
+                if hw_bottom is None or b > hw_bottom:
+                    hw_bottom = b
+        if hw_bottom is not None:
+            return hw_bottom + 30
+        return patchcanvas.canvas.initial_pos.y() - int(self.fCanvasHeight * 0.35)
+
     def updateMiniCanvasLater(self):
         QTimer.singleShot(self.fMiniCanvasUpdateTimeout, self.ui.miniCanvasPreview.update)
 
@@ -2105,8 +2121,12 @@ class HostWindow(QMainWindow):
             pcIcon = patchcanvas.ICON_FILE
 
         below_y = None
-        if self.fWithCanvas and any(pat in clientName.lower() for pat in _BELOW_ALL_CLIENTS):
-            below_y = self._canvas_max_node_bottom() + 40
+        hw_place = False
+        if self.fWithCanvas:
+            if any(pat in clientName.lower() for pat in _BELOW_ALL_CLIENTS):
+                below_y = self._canvas_max_node_bottom() + 40
+            elif pcIcon == patchcanvas.ICON_HARDWARE:
+                hw_place = True
 
         patchcanvas.addGroup(clientId, clientName, pcSplit, pcIcon)
 
@@ -2116,6 +2136,14 @@ class HostWindow(QMainWindow):
             patchcanvas.setGroupPos(clientId, x, y)
         elif below_y is not None:
             patchcanvas.setGroupPos(clientId, patchcanvas.canvas.initial_pos.x(), below_y)
+        elif hw_place:
+            cx = patchcanvas.canvas.initial_pos.x()
+            hy = self._canvas_hardware_zone_bottom()
+            group = next((g for g in patchcanvas.canvas.group_list if g.group_id == clientId), None)
+            if group and group.widgets[1] is not None:
+                patchcanvas.setGroupPosFull(clientId, cx - 350, hy, cx + 350, hy)
+            else:
+                patchcanvas.setGroupPos(clientId, cx, hy)
 
         self.updateMiniCanvasLater()
 
