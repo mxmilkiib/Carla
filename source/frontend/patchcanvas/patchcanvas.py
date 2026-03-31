@@ -864,6 +864,16 @@ def focusGroupUsingGroupName(group_name):
             item.setSelected(True)
             return True
 
+def filterGroupsByName(text):
+    text_lower = text.lower()
+    for group in canvas.group_list:
+        match = (not text) or (text_lower in group.group_name.lower())
+        for widget in group.widgets:
+            if widget is None:
+                continue
+            widget.setOpacity(1.0 if match else 0.15)
+    canvas.scene.update()
+
 # ------------------------------------------------------------------------------------------------------------
 
 def addPort(group_id, port_id, port_name, port_mode, port_type, is_alternate=False):

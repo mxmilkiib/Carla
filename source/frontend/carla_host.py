@@ -43,6 +43,7 @@ if qt_config == 5:
         QBrush,
         QImage,
         QImageWriter,
+        QKeySequence,
         QPainter,
         QPalette,
     )
@@ -54,6 +55,7 @@ if qt_config == 5:
         QListWidgetItem,
         QGraphicsView,
         QMainWindow,
+        QShortcut,
         QToolButton,
     )
 
@@ -78,8 +80,10 @@ elif qt_config == 6:
         QFileSystemModel,
         QImage,
         QImageWriter,
+        QKeySequence,
         QPainter,
         QPalette,
+        QShortcut,
     )
     from PyQt6.QtWidgets import (
         QApplication,
@@ -1370,6 +1374,8 @@ class HostWindow(QMainWindow):
     @pyqtSlot()
     def slot_handleProjectLoadFinishedCallback(self):
         self.fIsProjectLoading = False
+        if self.host.is_engine_running():
+            self.host.clear_engine_xruns()
         self.projectLoadingFinished(False)
 
     # --------------------------------------------------------------------------------------------------------
@@ -1866,10 +1872,42 @@ class HostWindow(QMainWindow):
         else:
             self.ui.graphicsView.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
 
+        self.fCanvasSearchBar = QLineEdit(self.ui.graphicsView)
+        self.fCanvasSearchBar.setPlaceholderText("Filter nodes\u2026 (Esc to close)")
+        self.fCanvasSearchBar.setFixedWidth(240)
+        self.fCanvasSearchBar.hide()
+        self.fCanvasSearchBar.textChanged.connect(self.slot_canvasSearch)
+        QShortcut(QKeySequence("Ctrl+F"), self, activated=self.slot_showCanvasSearch)
+        QShortcut(QKeySequence("Escape"), self.fCanvasSearchBar, activated=self.slot_hideCanvasSearch)
+
     def updateCanvasInitialPos(self):
         x = self.ui.graphicsView.horizontalScrollBar().value() + self.width()/4
         y = self.ui.graphicsView.verticalScrollBar().value() + self.height()/4
         patchcanvas.setInitialPos(x, y)
+
+    @pyqtSlot()
+    def slot_showCanvasSearch(self):
+        if not self.fWithCanvas:
+            return
+        if self.ui.tabWidget.currentIndex() != 1:
+            return
+        self.fCanvasSearchBar.move(
+            self.ui.graphicsView.width() - self.fCanvasSearchBar.width() - 8, 8)
+        self.fCanvasSearchBar.show()
+        self.fCanvasSearchBar.setFocus()
+        self.fCanvasSearchBar.selectAll()
+
+    @pyqtSlot()
+    def slot_hideCanvasSearch(self):
+        self.fCanvasSearchBar.clear()
+        self.fCanvasSearchBar.hide()
+        patchcanvas.filterGroupsByName("")
+        self.updateMiniCanvasLater()
+
+    @pyqtSlot(str)
+    def slot_canvasSearch(self, text):
+        patchcanvas.filterGroupsByName(text)
+        self.updateMiniCanvasLater()
 
     def _canvas_max_node_bottom(self):
         max_bottom = None
