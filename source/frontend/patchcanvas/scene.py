@@ -155,8 +155,15 @@ class PatchScene(QGraphicsScene):
                         max_y = max(max_y, y + rect.height())
 
             if not first_value:
-                self.m_view.fitInView(min_x, min_y, abs(max_x - min_x), abs(max_y - min_y), Qt.KeepAspectRatio)
+                w = abs(max_x - min_x)
+                h = abs(max_y - min_y)
+                pad_x = max(w * 0.12, 50.0)
+                pad_y = max(h * 0.12, 50.0)
+                fit = QRectF(min_x - pad_x, min_y - pad_y, w + 2*pad_x, h + 2*pad_y)
+                self.m_view.fitInView(fit, Qt.KeepAspectRatio)
                 self.fixScaleFactor()
+                return fit
+        return None
 
     def zoom_in(self):
         view = self.m_view

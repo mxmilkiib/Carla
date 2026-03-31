@@ -130,6 +130,11 @@ class CanvasPreviewFrame(QFrame):
         self.fViewRect[self._kRectHeight] = height * self.fInternalHeight
         self.update()
 
+    def setRenderSource(self, rect: QRectF):
+        self.fRenderSource = rect
+        self.fInternalRatio = rect.width() / rect.height() if rect.height() > 0 else 1.0
+        self.update()
+
     def setViewTheme(self, bgColor, brushColor, penColor):
         bg_black      = bgColor.blackF()
         brush_black   = brushColor.blackF()

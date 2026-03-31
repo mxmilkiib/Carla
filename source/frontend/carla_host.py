@@ -1701,7 +1701,10 @@ class HostWindow(QMainWindow):
 
     @pyqtSlot()
     def slot_canvasZoomFit(self):
-        self.scene.zoom_fit()
+        fit = self.scene.zoom_fit()
+        if fit is not None:
+            self.ui.miniCanvasPreview.setRenderSource(fit)
+            self.updateMiniCanvasLater()
 
     @pyqtSlot()
     def slot_canvasZoomIn(self):
