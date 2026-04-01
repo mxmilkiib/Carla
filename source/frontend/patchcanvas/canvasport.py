@@ -10,11 +10,11 @@ from math import floor
 from qt_compat import qt_config
 
 if qt_config == 5:
-    from PyQt5.QtCore import qCritical, Qt, QLineF, QPointF, QRectF, QTimer
+    from PyQt5.QtCore import qCritical, QT_VERSION, Qt, QLineF, QPointF, QRectF, QTimer
     from PyQt5.QtGui import QCursor, QFont, QFontMetrics, QPainter, QPainterPath, QPen, QPolygonF
     from PyQt5.QtWidgets import QGraphicsItem, QMenu
 elif qt_config == 6:
-    from PyQt6.QtCore import qCritical, Qt, QLineF, QPointF, QRectF, QTimer
+    from PyQt6.QtCore import qCritical, QT_VERSION, Qt, QLineF, QPointF, QRectF, QTimer
     from PyQt6.QtGui import QCursor, QFont, QFontMetrics, QPainter, QPainterPath, QPen, QPolygonF
     from PyQt6.QtWidgets import QGraphicsItem, QMenu
 
