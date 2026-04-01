@@ -1,6 +1,6 @@
 # Carla Integration Branch Configuration
 
-Last updated: 2026-04-01 (session 18)
+Last updated: 2026-04-01 (session 19)
 URL: https://gist.github.com/mxmilkiib/9c883e2022e978d9098311cbe4e2f875
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)
 
@@ -126,9 +126,9 @@ These are direct commits on `integrated` that fix regressions introduced by PR m
 
 ## Branch and Integration Status Outline
 
-**Summary**: 0 need attention, 0 awaiting review, 23 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
+**Summary**: 0 need attention, 0 awaiting review, 24 local-only, 0 secondary patches, 14 upstream PRs merged to integrated, 0 merged upstream
 
-Integration built 2026-04-01 (session 18): canvasport.py QT_VERSION import bugfix; 77 tests passing.
+Integration built 2026-04-01 (session 19): hardware node placement off-canvas bugfix; 77 tests passing.
 Qt6 frontend active: `qt_config.py` regenerated to `qt = 6`; `make generate-ui` regenerates `ui_*.py` with `pyuic6`; `make check` verifies syntax + UI import; `make test` runs pytest suite (`tests/test_frontend.py` 17 + `tests/test_settings_dialog.py` 15 + `tests/test_executables.py` 7 + `tests/test_plugin_browser.py` 19 + `tests/test_disk_tree.py` 19 = 77 tests; offscreen Qt).
 Patchbay port signal fix: `PatchbayPortAddedCallback` and `PatchbayPortChangedCallback` emits were missing `value3` (portGroupId); `slot_handlePatchbayPortChangedCallback` was missing the `portGroupId` param. Caused repeated `TypeError` in `carla-jack-multi`/`carla-jack-single` on every JACK port event.
 GitHub Actions IRC notification disabled on fork via `if: false` in `.github/workflows/irc.yml`.
@@ -188,6 +188,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 - [x] **bugfix/2026.03mar.30-settings-bool-sync** — `QSafeSettings.value()` now explicitly converts raw string "true"/"false" returns to Python bool; fixes StartWithPatchbay (and any other bool setting) silently falling back to defaultValue on PyQt6 builds where type coercion returns a str — merged 2026-03-30
 - [x] **feature/2026.03mar.30-disk-tree-collapse-persist** — `fileTreeView` expanded dirs persisted across restarts via `fExpandedDirs` set + `DiskExpandedDirs` QSettings key; `b_disk_collapse` button added to disk tab header (Collapse All); `slot_fileTreeExpanded`/`slot_fileTreeCollapsed` track state; `_restoreExpandedDirs` schedules restore 300 ms after load via QTimer; `RAYSESSION_NOTES.md` survey of implementable RaySession features — merged 2026-03-30
 - [x] **bugfix/2026.03mar.30-jack-timebase-nframes** — guard `nframes > 0` at the call site in `handleJackTimebaseCallback` before passing to `fillJackTimeInfo`; eliminates noisy `CARLA_SAFE_ASSERT_RETURN(newFrames > 0)` messages when JACK calls the timebase callback during transport relocation — merged 2026-03-30
+- [x] **bugfix/2026.04apr.01-hw-placement-before-addgroup** — `_canvas_hardware_zone_bottom()` was called after `addGroup`, so it scanned the just-added node at its random `CanvasGetNewGroupPos` position; if collision-avoidance pushed that to a large y the entire hardware zone stacked from there, placing nodes off-canvas and blowing out the minimap; fix: compute `hw_y` before `addGroup` — merged 2026-04-01
 - [x] **bugfix/2026.04apr.01-canvasport-qt-version** — `canvasport.py` `setPortName()` used `QT_VERSION` at line 141 but never imported it; `canvasbox.py` and `scene.py` both import it correctly from `PyQt5/6.QtCore` — added to match — merged 2026-04-01
 - [x] **feature/2026.03mar.31-plugins-tab-hardware-placement** — `ui_carla_host.py`: `w_plugins` moved from `tw_miniCanvas` to `tabUtils` (now sits alongside Disk + Transport); `retranslateUi` label updated; `_BELOW_ALL_CLIENTS` extended with `midi-bridge`, `a2j`, `a2jmidid`, `ble midi`, `bluetooth midi`; `_canvas_hardware_zone_bottom()` places `ICON_HARDWARE` nodes 35% above canvas centre, centred X, split nodes symmetric at ±350; `act_canvas_save_image` gains `Ctrl+Shift+I` shortcut — merged 2026-03-31
 - [x] **feature/2026.03mar.31-raysession-search-xrun** — `patchcanvas.filterGroupsByName(text)` dims non-matching group widgets to 0.15 opacity (clears on empty text); `fCanvasSearchBar` QLineEdit overlay on canvas, Ctrl+F shows it top-right, Esc clears and hides; `slot_handleProjectLoadFinishedCallback` calls `clear_engine_xruns()` on load — merged 2026-03-31
@@ -205,7 +206,7 @@ These branches are pushed to `mxmilkiib/Carla` and merged into `integrated`, but
 
 - Needs Attention (0 branches): (none)
 - Awaiting Review (0 branches): (none)
-- Local Development (23 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open, lv2-native-scalepoints, svg-text-qt6-crash, exec-deprecated-qt6, start-with-patchbay, plugin-browser-sidebar, settings-bool-sync, disk-tree-collapse-persist, jack-timebase-nframes, canvas-autozoom-plugin-autoload, canvas-fit-padding, canvas-node-placement, raysession-search-xrun, plugins-tab-hardware-placement, canvasport-qt-version
+- Local Development (24 branches): lv2-deadlock, file-open-folder, qt6-precedence, install-vst2-glob, log-missing-uri, dsp-refresh, canvas-autosize, drag-scroll, default-session-on-open, lv2-native-scalepoints, svg-text-qt6-crash, exec-deprecated-qt6, start-with-patchbay, plugin-browser-sidebar, settings-bool-sync, disk-tree-collapse-persist, jack-timebase-nframes, canvas-autozoom-plugin-autoload, canvas-fit-padding, canvas-node-placement, raysession-search-xrun, plugins-tab-hardware-placement, canvasport-qt-version, hw-placement-before-addgroup
 - Secondary Patches (0 branches): (none)
 
 See **Feature Request Branch TODO** section at the end of this file for planned work.
