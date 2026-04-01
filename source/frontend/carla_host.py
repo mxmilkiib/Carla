@@ -2121,12 +2121,12 @@ class HostWindow(QMainWindow):
             pcIcon = patchcanvas.ICON_FILE
 
         below_y = None
-        hw_place = False
+        hw_y    = None
         if self.fWithCanvas:
             if any(pat in clientName.lower() for pat in _BELOW_ALL_CLIENTS):
                 below_y = self._canvas_max_node_bottom() + 40
             elif pcIcon == patchcanvas.ICON_HARDWARE:
-                hw_place = True
+                hw_y = self._canvas_hardware_zone_bottom()
 
         patchcanvas.addGroup(clientId, clientName, pcSplit, pcIcon)
 
@@ -2136,14 +2136,13 @@ class HostWindow(QMainWindow):
             patchcanvas.setGroupPos(clientId, x, y)
         elif below_y is not None:
             patchcanvas.setGroupPos(clientId, patchcanvas.canvas.initial_pos.x(), below_y)
-        elif hw_place:
-            cx = patchcanvas.canvas.initial_pos.x()
-            hy = self._canvas_hardware_zone_bottom()
+        elif hw_y is not None:
+            cx    = patchcanvas.canvas.initial_pos.x()
             group = next((g for g in patchcanvas.canvas.group_list if g.group_id == clientId), None)
             if group and group.widgets[1] is not None:
-                patchcanvas.setGroupPosFull(clientId, cx - 350, hy, cx + 350, hy)
+                patchcanvas.setGroupPosFull(clientId, cx - 350, hw_y, cx + 350, hw_y)
             else:
-                patchcanvas.setGroupPos(clientId, cx, hy)
+                patchcanvas.setGroupPos(clientId, cx, hw_y)
 
         self.updateMiniCanvasLater()
 
